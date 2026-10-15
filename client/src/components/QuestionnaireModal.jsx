@@ -21,41 +21,41 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-[#0F172A] border border-amber-500/40 rounded-2xl shadow-2xl p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-lowest/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-lg bg-surface-container border border-white/10 rounded-2xl shadow-2xl shadow-primary-container/20 p-6 sm:p-8">
         {/* Botón Cerrar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white"
+          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-white"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center space-x-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+        <div className="flex items-center space-x-2 text-primary text-xs font-bold uppercase tracking-wider mb-1">
           <Sparkles className="w-4 h-4" />
           <span>RF-09 / Motor de Afinidad</span>
         </div>
-        <h2 className="text-2xl font-black text-slate-100 font-mythic">
+        <h2 className="text-2xl font-black text-on-surface font-mythic">
           Cuestionario de Preferencias
         </h2>
-        <p className="text-xs text-slate-400 mt-1 mb-6">
-          Personaliza tu feed. El algoritmo asignará <span className="text-amber-400 font-bold">+3 puntos</span> a tu franquicia, <span className="text-amber-400 font-bold">+2</span> a tu categoría y <span className="text-amber-400 font-bold">+1</span> dentro de tu presupuesto.
+        <p className="text-xs text-on-surface-variant mt-1 mb-6">
+          Personaliza tu feed. El algoritmo asignará <span className="text-secondary font-bold">+3 puntos</span> a tu franquicia, <span className="text-secondary font-bold">+2</span> a tu categoría y <span className="text-secondary font-bold">+1</span> dentro de tu presupuesto.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Franquicia (+3 pts) */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
+            <label className="block text-xs font-bold text-on-surface-variant mb-1 flex items-center justify-between">
               <span className="flex items-center space-x-1">
-                <Target className="w-3.5 h-3.5 text-amber-400" />
+                <Target className="w-3.5 h-3.5 text-tertiary" />
                 <span>1. Franquicia de Interés Principal</span>
               </span>
-              <span className="text-amber-400 font-mono text-[11px]">+3 pts</span>
+              <span className="text-secondary font-mono text-[11px]">+3 pts</span>
             </label>
             <select
               value={formData.franquicia_interes}
               onChange={(e) => setFormData({ ...formData, franquicia_interes: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+              className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-sm text-on-surface focus:outline-none focus:border-tertiary"
             >
               <option value="Star Wars">Star Wars</option>
               <option value="Pokémon">Pokémon</option>
@@ -68,17 +68,17 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
 
           {/* Categoría (+2 pts) */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
+            <label className="block text-xs font-bold text-on-surface-variant mb-1 flex items-center justify-between">
               <span className="flex items-center space-x-1">
-                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <Award className="w-3.5 h-3.5 text-tertiary" />
                 <span>2. Categoría Preferida</span>
               </span>
-              <span className="text-amber-400 font-mono text-[11px]">+2 pts</span>
+              <span className="text-secondary font-mono text-[11px]">+2 pts</span>
             </label>
             <select
               value={formData.categoria_preferida}
               onChange={(e) => setFormData({ ...formData, categoria_preferida: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+              className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-sm text-on-surface focus:outline-none focus:border-tertiary"
             >
               <option value="Figuras de Acción">Figuras de Acción</option>
               <option value="Cartas TCG">Cartas TCG</option>
@@ -90,8 +90,8 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
 
           {/* Década de Interés */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center space-x-1">
-              <Compass className="w-3.5 h-3.5 text-amber-400" />
+            <label className="block text-xs font-bold text-on-surface-variant mb-1 flex items-center space-x-1">
+              <Compass className="w-3.5 h-3.5 text-tertiary" />
               <span>3. Década de Nostalgia</span>
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -102,8 +102,8 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
                   onClick={() => setFormData({ ...formData, decada_interes: dec })}
                   className={`py-2 text-xs font-bold rounded-lg border transition-all ${
                     formData.decada_interes === dec
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-primary-container/20 border-primary-container text-primary shadow-md shadow-primary-container/20'
+                      : 'bg-surface-lowest border-white/10 text-on-surface-variant hover:border-primary-container/50'
                   }`}
                 >
                   {dec}
@@ -114,32 +114,32 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
 
           {/* Rango de Presupuesto (+1 pt) */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
+            <label className="block text-xs font-bold text-on-surface-variant mb-1 flex items-center justify-between">
               <span className="flex items-center space-x-1">
-                <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+                <DollarSign className="w-3.5 h-3.5 text-tertiary" />
                 <span>4. Rango de Presupuesto (USD)</span>
               </span>
-              <span className="text-amber-400 font-mono text-[11px]">+1 pto</span>
+              <span className="text-secondary font-mono text-[11px]">+1 pto</span>
             </label>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-[10px] text-slate-500 block">Mínimo ($)</span>
+                <span className="text-[10px] text-outline block">Mínimo ($)</span>
                 <input
                   type="number"
                   min="0"
                   value={formData.presupuesto_min}
                   onChange={(e) => setFormData({ ...formData, presupuesto_min: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-200"
+                  className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-sm text-on-surface focus:outline-none focus:border-tertiary"
                 />
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 block">Máximo ($)</span>
+                <span className="text-[10px] text-outline block">Máximo ($)</span>
                 <input
                   type="number"
                   min="0"
                   value={formData.presupuesto_max}
                   onChange={(e) => setFormData({ ...formData, presupuesto_max: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-200"
+                  className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-sm text-on-surface focus:outline-none focus:border-tertiary"
                 />
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20"
+              className="w-full py-3 rounded-lg bg-primary-container hover:bg-primary-dark text-white font-bold text-sm uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40"
             >
               Aplicar y Calcular Recomendaciones
             </button>

@@ -279,17 +279,17 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+      <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-between selection:bg-primary-container selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-bounce">
           <div
             className={`px-4 py-3 rounded-xl border shadow-2xl text-xs font-semibold flex items-center space-x-2 ${
               toastMessage.type === 'error'
-                ? 'bg-rose-950/90 border-rose-500 text-rose-200'
+                ? 'bg-danger-container/90 border-danger text-danger'
                 : toastMessage.type === 'success'
                 ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
-                : 'bg-slate-900/90 border-amber-500/50 text-amber-200'
+                : 'bg-surface-high/90 border-primary-container/50 text-primary'
             }`}
           >
             <span>{toastMessage.msg}</span>
@@ -310,25 +310,24 @@ export default function App() {
       {/* Contenido Principal */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
         {/* Hero Section Coleccionable */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-slate-800 p-8 sm:p-12 mb-10 shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-surface-low via-primary-container/20 to-surface-low border border-white/10 p-8 sm:p-12 mb-10 shadow-2xl">
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-widest">
-              <Shield className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary-container/15 border border-primary-container/40 text-primary text-xs font-bold uppercase tracking-widest">
               <span>Garantía de Autenticidad Curada & Trazabilidad Histórica</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black font-mythic tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-amber-100 to-amber-300 leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-black font-mythic tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-primary to-secondary leading-tight">
               Piezas Legendarias que Trascendieron el Tiempo
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+            <p className="text-sm sm:text-base text-on-surface-variant leading-relaxed max-w-2xl">
               Mythic Shelf es el santuario de comercio electrónico para coleccionistas exigentes. Cada figura vintage, carta codiciada y cartucho sellado cuenta con procedencia verificada, contexto de época y resguardo asegurado.
             </p>
 
             <div className="pt-2 flex flex-wrap gap-4">
               <button
                 onClick={() => setQuestionnaireOpen(true)}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 flex items-center space-x-2"
+                className="px-6 py-3 rounded-xl bg-primary-container hover:bg-primary-dark text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40 flex items-center space-x-2"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Configurar Preferencias de Búsqueda</span>
@@ -356,13 +355,13 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 bg-[#080B12] py-8 text-center text-xs text-slate-500 mt-16">
+      <footer className="border-t border-white/10 bg-surface-lowest py-8 text-center text-xs text-outline mt-16">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-mythic font-bold text-slate-400 text-sm">MYTHIC SHELF</span>
+            <span className="font-mythic font-bold text-on-surface-variant text-sm">MYTHIC SHELF</span>
             <span>• Arquitectura Full-Stack B2C</span>
           </div>
-          <div className="text-slate-400">
+          <div className="text-on-surface-variant">
             Powered by Node.js, Express, Microsoft SQL Server, React & Tailwind CSS
           </div>
         </div>

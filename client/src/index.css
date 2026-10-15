@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    background-color: #0B0F19;
-    color: #F8FAFC;
+    background-color: #071424;
+    color: #d7e3fa;
     font-family: 'Inter', sans-serif;
   }
 
@@ -19,13 +19,12 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0F172A;
+  background: #101c2c;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #2a3547;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D97706;
+  background: #b026ff;
 }
-

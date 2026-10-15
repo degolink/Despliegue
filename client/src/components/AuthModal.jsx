@@ -52,23 +52,23 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md bg-[#0F172A] border border-amber-500/40 rounded-2xl shadow-2xl p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-lowest/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md bg-surface-container border border-white/10 rounded-2xl shadow-2xl shadow-primary-container/20 p-6 sm:p-8">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white"
+          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-white"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Selector Login / Registro */}
-        <div className="flex border-b border-slate-800 mb-6">
+        <div className="flex border-b border-white/10 mb-6">
           <button
             onClick={() => setMode('login')}
             className={`flex-1 pb-3 text-sm font-bold transition-colors ${
               mode === 'login'
-                ? 'border-b-2 border-amber-400 text-amber-300'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'border-b-2 border-primary-container text-primary'
+                : 'text-outline hover:text-on-surface-variant'
             }`}
           >
             Iniciar Sesión
@@ -77,8 +77,8 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
             onClick={() => setMode('register')}
             className={`flex-1 pb-3 text-sm font-bold transition-colors ${
               mode === 'register'
-                ? 'border-b-2 border-amber-400 text-amber-300'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'border-b-2 border-primary-container text-primary'
+                : 'text-outline hover:text-on-surface-variant'
             }`}
           >
             Crear Cuenta
@@ -86,7 +86,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
+          <div className="mb-4 p-3 rounded-lg bg-danger-container/30 border border-danger/40 text-danger text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -95,66 +95,66 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-on-surface-variant mb-1">
                 Nombre Completo
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   required
                   placeholder="ej. Indiana Jones"
                   value={formData.nombre_completo}
                   onChange={(e) => setFormData({ ...formData, nombre_completo: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-on-surface-variant mb-1">
               Correo Electrónico
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 required
                 placeholder="collector@mythicshelf.com"
                 value={formData.correo_electronico}
                 onChange={(e) => setFormData({ ...formData, correo_electronico: e.target.value })}
-                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-on-surface-variant mb-1">
               Contraseña
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 required
                 placeholder="••••••••"
                 value={formData.contrasena}
                 onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
-                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
               />
             </div>
           </div>
 
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-on-surface-variant mb-1">
                 Rol en la Plataforma
               </label>
               <select
                 value={formData.rol}
                 onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface focus:outline-none focus:border-tertiary"
               >
                 <option value="Comprador">Comprador (Coleccionista)</option>
                 <option value="Vendedor">Vendedor (Curador / Tienda)</option>
@@ -166,7 +166,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-primary-container hover:bg-primary-dark text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40 disabled:opacity-50"
             >
               {loading
                 ? 'Conectando...'
@@ -178,20 +178,20 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
         </form>
 
         {/* Demo Fast-login Buttons */}
-        <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-          <span className="text-[10px] text-slate-500 uppercase block font-semibold mb-2">
+        <div className="mt-6 pt-4 border-t border-white/10 text-center">
+          <span className="text-[10px] text-outline uppercase block font-semibold mb-2">
             Acceso Rápido a Cuentas Semilla:
           </span>
           <div className="flex justify-center gap-2">
             <button
               onClick={() => handleFillDemo('buyer')}
-              className="px-2.5 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-amber-300 rounded border border-amber-500/30"
+              className="px-2.5 py-1 text-[11px] bg-primary-container/10 hover:bg-primary-container/20 text-primary rounded border border-primary-container/40"
             >
               Comprador Demo
             </button>
             <button
               onClick={() => handleFillDemo('seller')}
-              className="px-2.5 py-1 text-[11px] bg-slate-800 hover:bg-slate-700 text-sky-300 rounded border border-sky-500/30"
+              className="px-2.5 py-1 text-[11px] bg-tertiary/10 hover:bg-tertiary/20 text-tertiary rounded border border-tertiary/40"
             >
               Vendedor Demo
             </button>
@@ -201,4 +201,3 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
     </div>
   );
 }
-
