@@ -31,42 +31,123 @@ La base de datos `MythicShelfDB` implementa el siguiente modelo estructurado:
 
 ---
 
-## 🧩 Módulos Funcionales y Casos de Uso
+## 🧩 Módulos Funcionales y Casos de Uso del Sistema
 
-### 1. Gestión de Usuarios y Autenticación (GUS)
-- **CU-01 (Registro):** Creación de cuenta con rol, validación Zod y envío de correo de bienvenida vía SMTP.
-- **CU-02 (Login/Logout):** Autenticación mediante JWT y verificación de hash con bcrypt.
-- **CU-03 (Perfil):** Consulta y edición de datos del coleccionista y sus preferencias.
-- **RF-03 (Recuperación):** Generación de token temporal con expiración de 1 hora enviado por correo.
+La plataforma Mythic Shelf está arquitecturada en 9 módulos modulares que cubren el ciclo completo de la experiencia B2C para coleccionables:
 
-### 2. Catálogo y Contexto Histórico (CAT / CH)
-- **CU-04 (Catálogo):** Filtros dinámicos combinables en tiempo real por franquicia, categoría, década y precio máximo.
-- **CU-05 (Detalle de Coleccionable):** Despliegue de atributos patrimoniales:
-  - Año de fabricación original
-  - Tirada de producción estimada
-  - Procedencia / línea de custodia
-  - Nivel y certificado de autenticidad (AFA, PSA, Wata, Mythic Vault)
-  - Variantes de diseño e impacto cultural
+### 1. Módulo de Gestión de Usuarios y Autenticación (GUS)
+Gestiona la identidad, seguridad y ciclo de vida de las cuentas de usuario en la plataforma.
+- **CU-01 (Registro de Usuario):** Registro de compradores y vendedores. Valida unicidad de correo, aplica hash bcrypt (costo 10), persiste en `USUARIOS` y dispara email de bienvenida SMTP.
+- **CU-02 (Inicio y Cierre de Sesión):** Autenticación mediante credenciales. Genera y retorna un token JWT firmado (`usuario_id`, `rol`, expiración de 7 días). Cierre de sesión mediante invalidación en cliente.
+- **CU-03 (Visualizar y Editar Perfil):** Consulta de datos personales del coleccionista y sus preferencias históricas vinculadas en `PREFERENCIAS_USUARIO`.
+- **RF-03 (Recuperación de Contraseña vía SMTP):** Generación de token criptográfico temporal con ventana de expiración de 1 hora, enviado por correo electrónico para restablecer la contraseña de forma segura.
+- **Roles y Permisos:**
+  - **Visitante:** Navegación por el catálogo público y prueba en memoria del cuestionario de afinidad.
+  - **Comprador:** Acceso a perfil, guardado de preferencias, gestión de carrito persistente y checkout transaccional.
+  - **Vendedor:** Capacidad de registrar coleccionables y describir su contexto histórico.
+  - **Administrador:** Control y supervisión global de la plataforma y auditoría de transacciones.
+- **Archivos Clave:** `server/src/controllers/authController.js`, `server/src/routes/authRoutes.js`, `client/src/components/AuthModal.jsx`.
 
-### 3. Motor de Recomendaciones (REC)
-- **RF-09 & CU-06 (Cuestionario Interactivo y Preferencias):** El usuario responde preguntas breves sobre su pasión coleccionista.
+---
+
+### 2. Módulo de Catálogo y Contexto Histórico (CAT / CH)
+Exhibe las piezas coleccionables enriquecidas con información histórica, arqueológica y cultural de cada pieza.
+- **CU-04 (Catálogo y Filtrado Dinámico en Tiempo Real):** Exploración paginada del inventario disponible con filtros combinables simultáneamente por:
+  - Franquicia (*Star Wars, Pokémon, Transformers, Nintendo, etc.*)
+  - Categoría (*Figuras de Acción, Cartas TCG, Videojuegos Retro, Vehículos y Naves*)
+  - Década (*1970s, 1980s, 1990s, 2000s*)
+  - Presupuesto máximo
+  - Búsqueda textual por nombre o personaje
+- **CU-05 (Detalle de Producto y Contexto Histórico):** Vista profunda que expone la ficha técnica de la pieza con procedencia y autenticidad:
+  - **Año de fabricación original:** Datación de la pieza.
+  - **Tirada de producción:** Tirada estimada o indicativo de lote limitado.
+  - **Procedencia:** Trazabilidad de origen y cadena de custodia.
+  - **Variantes de diseño:** Detalles particulares de manufactura, empaque o errores de tirada que elevan su rareza.
+  - **Relevancia cultural:** Narrativa contextual de su época e impacto en la cultura pop.
+  - **Nivel de autenticidad:** Certificación oficial (AFA Graded, PSA, Wata, inspección curatorial Mythic Shelf).
+- **Archivos Clave:** `server/src/controllers/productController.js`, `server/src/routes/productRoutes.js`, `client/src/components/Catalog.jsx`, `client/src/components/ProductModal.jsx`.
+
+---
+
+### 3. Módulo de Preferencias y Motor de Recomendaciones (REC)
+Personaliza la experiencia del comprador calculando afinidad de coleccionismo mediante un algoritmo de emparejamiento basado en contenido (*Content-Based Matching*).
+- **RF-09 (Cuestionario Interactivo Opcional):** Encuesta interactiva donde el coleccionista define su franquicia favorita, categoría de predilección, década nostálgica y rango presupuestario.
+- **CU-06 (Captura y Persistencia de Preferencias):** Almacenamiento y actualización transaccional mediante `MERGE` en `PREFERENCIAS_USUARIO`.
 - **RF-10 (Cálculo de Afinidad - Content-Based Matching):**
+  Cada coleccionable en stock es evaluado dinámicamente con la fórmula:
   $$\text{Score} = (\text{Match Franquicia} \times 3) + (\text{Match Categoría} \times 2) + (\text{Precio en Presupuesto} \times 1)$$
-  El feed prioriza descendientemente las piezas según este puntaje, mostrando badges explicativos en cada tarjeta.
+  - **Franquicia coincidente:** $+3$ puntos.
+  - **Categoría coincidente:** $+2$ puntos.
+  - **Precio en rango $[min, max]$:** $+1$ punto.
+  Los productos son ordenados descendentemente por su puntaje, acompañados de un banner explicativo y chips de puntaje visual en cada tarjeta.
+- **Archivos Clave:** `server/src/services/recommendationService.js`, `server/src/controllers/recommendationController.js`, `client/src/components/QuestionnaireModal.jsx`, `client/src/components/RecommendationBanner.jsx`.
 
-### 4. Carrito de Compras en Vivo (CAR)
-- **CU-07:** Agregar productos, ajustar cantidades, eliminar o vaciar carrito.
-- **CU-07.5:** Validación estricta de existencias en SQL Server en tiempo real antes de registrar adiciones o modificaciones.
+---
 
-### 5. Checkout Transaccional (CHK)
-- **CU-08 (Checkout Atómico ACID):**
-  1. Adquisición de bloqueo de fila (`WITH (UPDLOCK, ROWLOCK)`) sobre cada producto para prevenir condiciones de carrera (*race conditions*).
-  2. Validación final de stock disponible.
-  3. Inserción de cabecera en `ORDENES` y captura de `orden_id`.
-  4. Inserción de líneas en `DETALLE_ORDEN`.
-  5. Descuento atómico de existencias en `PRODUCTOS` (`stock = stock - cantidad`).
-  6. Vaciado de los ítems adquiridos en `CARRITO_ITEMS`.
-  7. Confirmación con `COMMIT TRANSACTION` o reversión completa con `ROLLBACK TRANSACTION`.
+### 4. Módulo de Carrito de Compras en Tiempo Real (CAR)
+Garantiza la gestión fluida y la persistencia de las piezas seleccionadas antes del proceso de compra.
+- **CU-07.1 (Agregar Producto):** Inserta un ítem en `CARRITO_ITEMS` o incrementa su cantidad si ya existía.
+- **CU-07.2 (Modificar Cantidades):** Ajuste de unidades en el carrito con verificación de topes.
+- **CU-07.3 (Eliminar Producto):** Retiro selectivo de una pieza del carrito.
+- **CU-07.4 (Vaciar Carrito):** Eliminación en bloque de todos los ítems del usuario.
+- **CU-07.5 (Validación de Stock en Tiempo Real):** Antes de cualquier adición o actualización, se consulta el stock vivo en SQL Server para evitar sobrepasar las existencias reales del almacén.
+- **Persistencia Vinculada:** El carrito se almacena en la tabla `CARRITO_ITEMS` asociado al `usuario_id`, manteniéndose accesible entre diferentes sesiones o dispositivos.
+- **Archivos Clave:** `server/src/controllers/cartController.js`, `server/src/routes/cartRoutes.js`, `client/src/components/CartDrawer.jsx`.
+
+---
+
+### 5. Módulo de Checkout y Pedidos Transaccionales (CHK)
+Ejecuta la compra garantizando la consistencia absoluta del inventario mediante transacciones ACID en Microsoft SQL Server.
+- **CU-08 (Checkout con Datos de Envío y Confirmación Atómica):**
+  Flujo transaccional ejecutado dentro de un bloque `sql.Transaction`:
+  1. **Bloqueo exclusivo de filas (`WITH (UPDLOCK, ROWLOCK)`):** Bloquea los registros de `PRODUCTOS` de los ítems en el carrito para prevenir condiciones de carrera (*race conditions*).
+  2. **Validación final de existencias:** Comprueba que `stock >= cantidad_solicitada` para cada ítem. Si falla alguno, aborta y lanza error 409 detallado.
+  3. **Cálculo de total con precios reales:** Obtiene los precios directamente de la base de datos para evitar manipulaciones desde el frontend.
+  4. **Inserción de cabecera en `ORDENES`:** Registra total, dirección y método de envío capturando el `orden_id`.
+  5. **Inserción de líneas en `DETALLE_ORDEN`:** Registra cada producto con su precio unitario congelado al momento de compra.
+  6. **Descuento atómico de existencias:** Ejecuta `UPDATE PRODUCTOS SET stock = stock - cantidad`.
+  7. **Vaciado de `CARRITO_ITEMS`:** Elimina los ítems adquiridos del carrito del usuario.
+  8. **Confirmación con `COMMIT`:** Asienta los cambios de manera irrevocable en la base de datos. En caso de cualquier error intermedio, ejecuta `ROLLBACK` automático.
+  9. **Emisión de Comprobante:** Genera recibo digital con código de orden, desglose de coleccionables, fecha y garantías de custodia.
+- **Archivos Clave:** `server/src/services/checkoutService.js`, `server/src/controllers/checkoutController.js`, `client/src/components/CheckoutModal.jsx`.
+
+---
+
+### 6. Módulo de Seguridad, Autorización y Validación (SEC / RBAC)
+Establece las defensas perimetrales y de datos de la API REST.
+- **Autenticación Stateless JWT:** Verificación del token Bearer en cabeceras `Authorization` en cada solicitud protegida.
+- **Control de Acceso Basado en Roles (RBAC):** Middleware `authorizeRoles('Comprador', 'Vendedor', 'Administrador')` para restringir endpoints según privilegios.
+- **Cifrado de Contraseñas:** Algoritmo `bcryptjs` con factor de coste (*salt*) de 10 rondas.
+- **Validación de Esquemas Zod:** Validación estricta de todos los payloads entrantes (`body`, `params`, `query`), rechazando datos malformados con respuestas 400 detalladas.
+- **Cabeceras HTTP y CORS:** Protección con `Helmet` y configuración de políticas de origen cruzado (`cors`) para limitar solicitudes únicamente al origen del frontend.
+- **Archivos Clave:** `server/src/middlewares/auth.js`, `server/src/middlewares/validate.js`, `server/src/validators/index.js`, `server/src/middlewares/errorHandler.js`.
+
+---
+
+### 7. Módulo de Notificaciones y Mensajería SMTP (NOT / SMTP)
+Canal de comunicación automatizado con los usuarios mediante correo electrónico.
+- **Envío de Bienvenida:** Disparo automático de correo con diseño HTML estilizado tras completar el registro (CU-01).
+- **Recuperación de Credenciales:** Emisión de correo con enlace seguro y token criptográfico temporal para restablecer la contraseña (RF-03).
+- **Configuración SMTP Flexible:** Compatible con servicios de producción (SendGrid, Mailgun, Amazon SES) y entornos de prueba (Ethereal Email, Mailtrap).
+- **Archivos Clave:** `server/src/config/mailer.js`.
+
+---
+
+### 8. Módulo de Migraciones y Persistencia de Base de Datos (MIG / DDL)
+Administra la estructura del esquema relacional y el aprovisionamiento de datos iniciales.
+- **Scripts DDL Declarativos:** Definición completa de tablas, restricciones de clave primaria `CLUSTERED`, claves foráneas con integridad referencial, restricciones `CHECK` para rangos y estados, e índices no agrupados optimizados para filtrado dinámico.
+- **Carga de Datos Semilla (Seeds):** Inserción automatizada de usuarios de prueba para cada rol y catálogo inicial de coleccionables legendarios con su respectivo contexto histórico.
+- **Ejecutor de Migraciones CLI:** Script `server/src/scripts/migrate.js` que se conecta a SQL Server y ejecuta secuencialmente los lotes delimitados por `GO`.
+- **Archivos Clave:** `database/schema.sql`, `server/src/scripts/migrate.js`.
+
+---
+
+### 9. Módulo de Interfaz de Usuario y Experiencia SPA (UI / UX)
+Presentación visual moderna orientada a coleccionistas de alta gama.
+- **Single Page Application (SPA):** Desarrollada con React 18, Vite y arquitectura de componentes funcionales con React Hooks.
+- **Tema Visual Mítico (Collector Theme):** Paleta oscura con contrastes ámbar y oro (`#F59E0B`, `#0B0F19`), tipografía *Cinzel* para ambientación de reliquias y *Inter* para lectura técnica.
+- **Interactividad Reactiva:** Drawer lateral deslizable para el carrito, modales para login, checkout y detalle histórico, cálculo dinámico de recomendaciones en tiempo real y notificaciones toast flotantes.
+- **Archivos Clave:** `client/src/App.jsx`, `client/src/components/*`, `client/src/index.css`, `client/tailwind.config.js`.
 
 ---
 
