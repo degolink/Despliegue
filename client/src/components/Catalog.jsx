@@ -110,15 +110,18 @@ export default function Catalog({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((item) => {
             const hasScore = item.recommendation_score != null && item.recommendation_score > 0;
+            // Las cartas son verticales: se muestran completas en lugar de recortarlas al 4:3.
+            const isCard = /^cartas/i.test(item.categoria || '');
+            const isSimilarImage = (item.imagen_url || '').includes('/catalog/similares/');
             return (
               <div
                 key={item.producto_id}
-                className="group bg-surface-container rounded-xl border border-white/10 hover:border-primary-container/60 transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-lg hover:shadow-primary-container/20 relative"
+                className="group bg-gradient-to-b from-surface-container to-surface rounded-xl border border-white/10 hover:border-tertiary/60 transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-lg hover:shadow-primary-container/20 relative"
               >
                 {/* Badge de Puntuación de Recomendación (+3, +2, +1) */}
                 {hasScore && (
-                  <div className="absolute top-3 left-3 z-10 bg-secondary-container text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg flex items-center space-x-1">
-                    <Sparkles className="w-3 h-3 fill-white" />
+                  <div className="absolute top-3 left-3 z-10 bg-secondary-container text-surface-lowest text-xs font-black px-2.5 py-1 rounded-full shadow-lg flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3 fill-surface-lowest" />
                     <span>Afinidad: {item.recommendation_score} pts</span>
                   </div>
                 )}
@@ -134,11 +137,18 @@ export default function Catalog({
                   className="aspect-[4/3] w-full bg-surface-lowest overflow-hidden relative cursor-pointer"
                 >
                   <img
-                    src={item.imagen_url || 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=800'}
+                    src={item.imagen_url || '/placeholder-collectible.svg'}
                     alt={item.nombre}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder-collectible.svg'; }}
+                    className={`w-full h-full ${isCard ? 'object-contain p-3' : 'object-cover'} group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100`}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent opacity-80" />
+                  {isSimilarImage && (
+                    <div className="absolute bottom-2 left-3 z-10 bg-surface-lowest/80 backdrop-blur-sm border border-white/10 text-on-surface-variant text-[10px] font-medium px-2 py-0.5 rounded-md">
+                      Imagen referencial
+                    </div>
+                  )}
                 </div>
 
                 {/* Contenido & Metadatos Coleccionables */}
@@ -179,7 +189,7 @@ export default function Catalog({
                   <div className="pt-3 border-t border-white/10 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-outline uppercase block font-medium">Precio</span>
-                      <span className="text-xl font-black text-secondary font-mono">
+                      <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary to-secondary font-mono">
                         ${Number(item.precio).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
@@ -187,7 +197,7 @@ export default function Catalog({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => onSelectProduct(item.producto_id)}
-                        className="px-3 py-1.5 rounded-lg border border-tertiary/50 text-tertiary hover:bg-tertiary/10 text-xs font-medium transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-metal border border-metal-border text-on-surface hover:bg-metal-hover text-xs font-medium transition-colors"
                       >
                         Historia
                       </button>

@@ -325,3 +325,42 @@ El script DDL precarga tres usuarios listos para iniciar sesión inmediatamente 
 ### Checkout Transaccional (`/api/checkout`)
 - `POST /api/checkout` — Ejecución transaccional atómica ACID con bloqueo de existencias.
 - `GET /api/checkout/orders` — Historial de pedidos del comprador.
+
+---
+
+## 🖼️ Catálogo de Imágenes de Coleccionables (seed verificado)
+
+Pobla la tienda con 42 coleccionables icónicos (juguetes vintage, cómics, cartas Pokémon/TCG, videojuegos retro, LEGO y memorabilia) **sin crear otra aplicación**: reutiliza `PRODUCTOS`, `CONTEXTO_HISTORICO` y `imagen_url`.
+
+**Archivos**
+
+| Archivo | Rol |
+| :--- | :--- |
+| `server/src/data/collectibles.catalog.js` | Catálogo curado (metadatos + cómo localizar cada imagen). |
+| `server/src/services/imageSourceService.js` | Resuelve y valida imágenes (Wikimedia Commons, Pokémon TCG API). |
+| `server/src/scripts/seedCatalog.js` | Seed idempotente (`npm run seed:catalog`). |
+| `database/migrations/001_imagenes_producto.sql` | Tabla **aditiva** `IMAGENES_PRODUCTO` (atribución, licencia, página fuente). No borra nada. |
+
+**Uso** (desde `server/`, con `server/.env` configurado y el usuario `seller@mythicshelf.com` existente):
+
+```bash
+npm run seed:catalog -- --dry-run     # solo resuelve imágenes y genera server/src/data/image-report.json
+npm run seed:catalog                  # siembra la BD (crea IMAGENES_PRODUCTO si falta)
+npm run seed:catalog -- --only=Charizard
+```
+
+Otras opciones: `--no-images`, `--refresh-images` (reemplaza la imagen actual y la marca como principal), `--update-context`, `--no-download`, `--seller=correo`.
+
+Para migrar las imágenes a una base ya sembrada: `npm run seed:catalog -- --refresh-images`.
+
+**Reglas de datos**
+
+- **No usar `npm run migrate` para esto**: `schema.sql` elimina y recrea todas las tablas. El seed no borra datos.
+- Re-ejecutar no duplica productos (clave `nombre + vendedor`), contexto ni imágenes, y **no modifica precio ni stock** de productos existentes.
+- **Migración local de imágenes**: las imágenes de Commons (licencias abiertas) se descargan a `client/public/catalog/` y `imagen_url` apunta a `/catalog/...`, así la tienda no depende de enlaces externos. Con `--no-download` se guardan URLs remotas verificadas (HTTPS, `Content-Type: image/*`, ≤ 255 caracteres). La atribución y licencia quedan en `IMAGENES_PRODUCTO`; el frontend muestra el crédito en el detalle y usa `client/public/placeholder-collectible.svg` si no hay imagen.
+- **Imágenes similares**: si no existe una imagen libre del producto exacto, se usa el archivo de Commons fijado en el campo `similar` del catálogo (misma franquicia, época o tipo de objeto, revisado a mano). Se guarda en `client/public/catalog/similares/`, su atribución empieza por "Imagen referencial similar" y el catálogo la marca con la etiqueta **Imagen referencial**.
+- **Commons**: solo se aceptan dominio público, CC0, CC BY y CC BY-SA; se rechazan NC/ND/fair use. La licencia cubre la fotografía o escaneo, no el diseño del producto (marcas y derechos de autor del producto siguen vigentes).
+- **Pokémon TCG API**: las imágenes de cartas pertenecen a Nintendo/Creatures/GAME FREAK/The Pokémon Company. Se enlazan solo como referencia y **no tienen licencia abierta**; confirme sus términos antes de un uso comercial real.
+- Si ninguna imagen cumple licencia y validación, el producto se crea **sin imagen** y el motivo queda en el reporte.
+- Todas las fichas son **ejemplos representativos de catálogo**: no son ejemplares graduados ni autenticados, y los **precios son de demostración**. Las cartas del set Base muestran arte genérico del set y no acreditan edición *1st Edition/Shadowless*; el Charizard de Celebrations (2021) está etiquetado como **reimpresión moderna**.
+- Variables opcionales: `WIKIMEDIA_USER_AGENT` (con contacto real), `POKEMONTCG_API_KEY`, `SEED_SELLER_EMAIL`.

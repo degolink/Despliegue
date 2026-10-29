@@ -7,36 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Fondo azul noche / pizarra oscuro: tarjetas de #161B22 a #0D1117
         surface: {
-          DEFAULT: '#071424',
-          lowest: '#030f1e',
-          low: '#101c2c',
-          container: '#142031',
-          high: '#1f2b3c',
-          highest: '#2a3547',
-          bright: '#2e3a4b',
+          DEFAULT: '#0D1117',
+          lowest: '#090C10',
+          low: '#11161D',
+          container: '#161B22',
+          high: '#1F2630',
+          highest: '#2A323D',
+          bright: '#30363D',
         },
         'on-surface': {
-          DEFAULT: '#d7e3fa',
-          variant: '#d2c1d7',
+          DEFAULT: '#E6EDF3',
+          variant: '#B1BAC4',
         },
         outline: {
-          DEFAULT: '#9b8ba1',
-          variant: '#4f4255',
+          DEFAULT: '#8B949E',
+          variant: '#30363D',
         },
+        // Rojo carmesí: acción principal (+ Carrito). Texto de acento en amarillo oro.
         primary: {
-          DEFAULT: '#e5b5ff',
-          container: '#b026ff',
-          dark: '#9200db',
-          'on': '#4e0078',
+          DEFAULT: '#FACC15',
+          container: '#DC2626',
+          dark: '#B91C1C',
+          'on': '#450A0A',
         },
+        // Amarillo oro / fuego: precios y badges. Verde ácido: afinidad.
         secondary: {
-          DEFAULT: '#ffb1c3',
-          container: '#ff4b89',
+          DEFAULT: '#F59E0B',
+          container: '#84CC16',
         },
+        // Verde ácido / toxic: detalles especiales y hover
         tertiary: {
-          DEFAULT: '#00daf3',
-          container: '#008190',
+          DEFAULT: '#A3E635',
+          container: '#84CC16',
+        },
+        // Gris metal oscuro / cadenas: acción secundaria (Historia)
+        metal: {
+          DEFAULT: '#334155',
+          border: '#64748B',
+          hover: '#475569',
         },
         danger: {
           DEFAULT: '#ffb4ab',
@@ -44,7 +54,10 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Cinzel', 'Inter', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        arcade: ['"Karmatic Arcade"', 'Bangers', 'sans-serif'],
+        comic: ['Bangers', 'Inter', 'sans-serif'],
+        marker: ['"Permanent Marker"', 'Inter', 'sans-serif'],
       }
     },
   },

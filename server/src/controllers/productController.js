@@ -93,7 +93,7 @@ const getProducts = async (req, res, next) => {
       INNER JOIN dbo.USUARIOS u ON p.vendedor_id = u.usuario_id
       LEFT JOIN dbo.CONTEXTO_HISTORICO ch ON p.producto_id = ch.producto_id
       ${whereSql}
-      ORDER BY ${sortField} ${sortDirection}
+      ORDER BY CASE WHEN p.imagen_url IS NULL OR p.imagen_url = '' THEN 1 ELSE 0 END, ${sortField} ${sortDirection}
       OFFSET @offset ROWS FETCH NEXT @limitNum ROWS ONLY;
     `;
 
@@ -161,9 +161,29 @@ const getProductById = async (req, res, next) => {
       });
     }
 
+    const product = result.recordset[0];
+
+    // Atribución/licencia de imágenes (tabla opcional: IMAGENES_PRODUCTO se crea con la migración 001).
+    // Si aún no existe, el detalle sigue funcionando sin ese bloque.
+    let imagenes = [];
+    try {
+      const imgs = await pool
+        .request()
+        .input('id', sql.Int, parseInt(id, 10))
+        .query(`
+          SELECT url, es_principal, fuente, pagina_fuente, atribucion, licencia, restricciones
+          FROM dbo.IMAGENES_PRODUCTO
+          WHERE producto_id = @id
+          ORDER BY es_principal DESC, imagen_id ASC;
+        `);
+      imagenes = imgs.recordset;
+    } catch (imgErr) {
+      imagenes = [];
+    }
+
     res.status(200).json({
       success: true,
-      data: result.recordset[0],
+      data: { ...product, imagenes },
     });
   } catch (error) {
     next(error);

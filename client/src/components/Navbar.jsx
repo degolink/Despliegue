@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Sparkles, User, LogOut, Shield, Compass } from 'lucide-react';
+import { ShoppingBag, Sparkles, User, LogOut, Compass } from 'lucide-react';
 
 export default function Navbar({
   cartCount,
@@ -14,14 +14,18 @@ export default function Navbar({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <div className="flex items-center space-x-3 cursor-pointer">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg shadow-primary-container/40 border border-primary/40">
-            <Shield className="w-6 h-6 text-white stroke-[2.5]" />
-          </div>
-          <div>
-              <span className="font-mythic text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-container to-secondary">
-              MYTHIC SHELF
+          <img
+            src="/logo-mythic-shelf.webp"
+            alt="Mythic Shelf"
+            className="h-14 w-auto drop-shadow-[0_0_10px_rgba(220,38,38,0.35)]"
+          />
+          <div className="hidden sm:block">
+            {/* Mismos colores que el logo: MYTHIC de carmesí a fuego, SHELF en placa roja con marco metálico */}
+            <span className="flex items-center gap-2 font-arcade text-2xl leading-none">
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-primary-container to-secondary">MYTHIC</span>
+              <span className="px-1.5 py-0.5 rounded bg-primary-container border-2 border-metal-border text-white text-xl">SHELF</span>
             </span>
-              <span className="block text-[10px] tracking-widest text-tertiary/80 uppercase font-semibold">
+            <span className="block mt-1 font-marker text-[11px] tracking-wide text-tertiary/90">
               Santuario de Coleccionables
             </span>
           </div>
@@ -47,7 +51,7 @@ export default function Navbar({
           >
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-secondary-container text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+              <span className="absolute -top-1.5 -right-1.5 bg-primary-container text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
                 {cartCount}
               </span>
             )}

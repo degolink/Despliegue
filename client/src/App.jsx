@@ -310,7 +310,7 @@ export default function App() {
       {/* Contenido Principal */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
         {/* Hero Section Coleccionable */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-surface-low via-primary-container/20 to-surface-low border border-white/10 p-8 sm:p-12 mb-10 shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-surface-low via-primary-container/20 to-surface-low border border-white/10 p-8 sm:p-12 mb-10 shadow-2xl flex items-center justify-between gap-8">
           <div className="max-w-3xl space-y-4">
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary-container/15 border border-primary-container/40 text-primary text-xs font-bold uppercase tracking-widest">
               <span>Garantía de Autenticidad Curada & Trazabilidad Histórica</span>
@@ -334,6 +334,12 @@ export default function App() {
               </button>
             </div>
           </div>
+
+          <img
+            src="/logo-mythic-shelf.webp"
+            alt="Mythic Shelf"
+            className="hidden md:block w-56 lg:w-72 shrink-0 drop-shadow-[0_0_25px_rgba(220,38,38,0.35)]"
+          />
         </div>
 
         {/* Banner de Recomendaciones con Puntaje */}
@@ -358,7 +364,7 @@ export default function App() {
       <footer className="border-t border-white/10 bg-surface-lowest py-8 text-center text-xs text-outline mt-16">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-mythic font-bold text-on-surface-variant text-sm">MYTHIC SHELF</span>
+            <span className="font-arcade text-on-surface-variant text-sm">MYTHIC SHELF</span>
             <span>• Arquitectura Full-Stack B2C</span>
           </div>
           <div className="text-on-surface-variant">

@@ -59,7 +59,7 @@ export default function CartDrawer({
                   className="bg-surface-container border border-white/10 rounded-xl p-4 flex gap-4 items-center"
                 >
                   <img
-                    src={item.imagen_url || 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=800'}
+                    src={item.imagen_url || '/placeholder-collectible.svg'}
                     alt={item.nombre}
                     className="w-16 h-16 rounded-lg object-cover bg-surface-lowest border border-white/10 shrink-0"
                   />

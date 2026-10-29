@@ -2,15 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Karmatic Arcade (Vic Fieger, licencia gratuita vía 1001freefonts.com): logo de la marca */
+@font-face {
+  font-family: 'Karmatic Arcade';
+  src: url('./assets/fonts/karmatic-arcade.ttf') format('truetype');
+  font-display: swap;
+}
+
 @layer base {
   body {
-    background-color: #071424;
-    color: #d7e3fa;
+    background-color: #0D1117;
+    color: #E6EDF3;
     font-family: 'Inter', sans-serif;
   }
 
+  /* Títulos en Bangers (estilo cómic); el logo usa font-arcade */
   h1, h2, h3, .font-mythic {
-    font-family: 'Cinzel', serif, sans-serif;
+    font-family: 'Bangers', 'Inter', sans-serif;
+    letter-spacing: 0.03em;
+    font-weight: 400;
   }
 }
 
@@ -19,12 +29,12 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #101c2c;
+  background: #11161D;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a3547;
+  background: #2A323D;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b026ff;
+  background: #DC2626;
 }

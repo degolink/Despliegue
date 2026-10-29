@@ -15,6 +15,9 @@ dist/
 build/
 client/dist/
 
+# Reporte generado por el seed de catálogo (reproducible)
+server/src/data/image-report.json
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

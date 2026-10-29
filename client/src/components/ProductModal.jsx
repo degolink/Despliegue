@@ -25,14 +25,35 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
           <div className="space-y-4">
             <div className="aspect-square rounded-xl overflow-hidden bg-surface-lowest border border-white/10 relative shadow-inner">
               <img
-                src={product.imagen_url || 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?w=800'}
+                src={product.imagen_url || '/placeholder-collectible.svg'}
                 alt={product.nombre}
-                className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder-collectible.svg'; }}
+                className={`w-full h-full ${/^cartas/i.test(product.categoria || '') ? 'object-contain p-4' : 'object-cover'}`}
               />
               <div className="absolute top-3 left-3 bg-primary-container text-white text-xs font-black px-3 py-1 rounded-md uppercase tracking-wide">
                 {product.decada}
               </div>
             </div>
+
+            {product.imagenes && product.imagenes.length > 0 && (
+              <p className="text-[10px] leading-snug text-outline">
+                Imagen: {product.imagenes[0].atribucion}
+                {product.imagenes[0].licencia ? ` · Licencia: ${product.imagenes[0].licencia}` : ''}
+                {product.imagenes[0].pagina_fuente && (
+                  <>
+                    {' · '}
+                    <a
+                      href={product.imagenes[0].pagina_fuente}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-on-surface-variant"
+                    >
+                      fuente
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
 
             <div className="bg-surface-low p-4 rounded-xl border border-white/10">
               <span className="text-xs text-on-surface-variant font-medium block mb-1">Estado de Conservación Curado:</span>
