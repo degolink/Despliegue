@@ -17,6 +17,9 @@ GO
 -- =====================================================================
 -- LIMPIEZA DE TABLAS PREVIAS (DROP ORDENADO POR DEPENDENCIAS)
 -- =====================================================================
+-- IMAGENES_PRODUCTO (migración 001) referencia a PRODUCTOS: debe borrarse primero,
+-- o el DROP de PRODUCTOS falla por la clave foránea.
+IF OBJECT_ID(N'dbo.IMAGENES_PRODUCTO', N'U') IS NOT NULL DROP TABLE dbo.IMAGENES_PRODUCTO;
 IF OBJECT_ID(N'dbo.DETALLE_ORDEN', N'U') IS NOT NULL DROP TABLE dbo.DETALLE_ORDEN;
 IF OBJECT_ID(N'dbo.ORDENES', N'U') IS NOT NULL DROP TABLE dbo.ORDENES;
 IF OBJECT_ID(N'dbo.CARRITO_ITEMS', N'U') IS NOT NULL DROP TABLE dbo.CARRITO_ITEMS;
