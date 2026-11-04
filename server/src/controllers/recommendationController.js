@@ -27,6 +27,7 @@ const getRecommendations = async (req, res, next) => {
 /**
  * Evaluar recomendaciones transitorias o guardar preferencias tras cuestionario
  * POST /api/recommendations/questionnaire
+ * Soporta tanto el test multidimensional de 20 preguntas (respuestas_test) como el formulario clásico
  */
 const submitQuestionnaire = async (req, res, next) => {
   try {
@@ -37,6 +38,7 @@ const submitQuestionnaire = async (req, res, next) => {
       decada_interes,
       presupuesto_min,
       presupuesto_max,
+      respuestas_test,
       persistir = true,
     } = req.body;
 
@@ -50,9 +52,10 @@ const submitQuestionnaire = async (req, res, next) => {
         decada_interes,
         presupuesto_min,
         presupuesto_max,
+        respuestas_test,
       });
     } else {
-      // Cálculo en caliente para visitantes o sin guardar
+      // Cálculo dinámico para visitantes o previsualización sin alterar preferencias guardadas
       result = await recommendationService.getRecommendations({
         customPreferences: {
           franquicia_interes,
@@ -61,12 +64,13 @@ const submitQuestionnaire = async (req, res, next) => {
           presupuesto_min,
           presupuesto_max,
         },
+        respuestas_test,
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Cuestionario procesado exitosamente. Puntajes de afinidad actualizados.',
+      message: 'Cuestionario procesado exitosamente. Perfil multidimensional y recomendaciones actualizadas.',
       data: result,
     });
   } catch (error) {
@@ -78,4 +82,3 @@ module.exports = {
   getRecommendations,
   submitQuestionnaire,
 };
-

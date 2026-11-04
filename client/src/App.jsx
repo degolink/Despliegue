@@ -36,6 +36,7 @@ export default function App() {
 
   // Estado de Recomendaciones (REC)
   const [activePreferences, setActivePreferences] = useState(null);
+  const [profileAnalysis, setProfileAnalysis] = useState(null);
   const [questionnaireOpen, setQuestionnaireOpen] = useState(false);
 
   // Estado de Detalle de Producto & Contexto Histórico (CU-05 / CH)
@@ -145,6 +146,9 @@ export default function App() {
         if (res.data.data.preferences_applied) {
           setActivePreferences(res.data.data.preferences_applied);
         }
+        if (res.data.data.profile_analysis) {
+          setProfileAnalysis(res.data.data.profile_analysis);
+        }
       }
     } catch (error) {
       console.error('Error al cargar catálogo:', error);
@@ -224,8 +228,11 @@ export default function App() {
       const res = await api.post('/recommendations/questionnaire', prefData);
       setActivePreferences(res.data.data.preferences_applied);
       setProducts(res.data.data.recommendations);
+      if (res.data.data.profile_analysis) {
+        setProfileAnalysis(res.data.data.profile_analysis);
+      }
       setQuestionnaireOpen(false);
-      showToast('¡Calibración exitosa! Archivo ordenado por afinidad (+3, +2, +1 pts).', 'success');
+      showToast('¡Calibración exitosa! Archivo ordenado por afinidad arqueológica.', 'success');
     } catch (err) {
       showToast('Error al procesar parámetros del concierge.', 'error');
     }
@@ -342,6 +349,7 @@ export default function App() {
         {/* Predictive Recommendation Scoring Banner */}
         <RecommendationBanner
           preferences={activePreferences}
+          profileAnalysis={profileAnalysis}
           onRetakeQuiz={() => setQuestionnaireOpen(true)}
         />
 

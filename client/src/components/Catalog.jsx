@@ -211,6 +211,14 @@ export default function Catalog({
                       </div>
                     </div>
 
+                    {/* Multidimensional Match Reason Badge */}
+                    {item.match_reason && (
+                      <div className="mb-3 px-3 py-2 rounded-xl bg-gold-500/10 border border-gold-500/20 text-[11px] text-gold-300 font-sans leading-relaxed flex items-start space-x-2">
+                        <Sparkles className="w-3.5 h-3.5 text-gold-400 shrink-0 mt-0.5" />
+                        <span>{item.match_reason}</span>
+                      </div>
+                    )}
+
                     <p className="text-xs text-platinum-400 line-clamp-2 italic font-light mb-4">
                       "{item.estado_conservacion}"
                     </p>

@@ -137,3 +137,4 @@ export default function HeroEditorial({ onOpenQuestionnaire, onExploreCatalog, f
     </section>
   );
 }
+

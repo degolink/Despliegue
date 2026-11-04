@@ -50,6 +50,7 @@ const questionnaireSchema = z.object({
   decada_interes: z.string().max(20).nullable().optional(),
   presupuesto_min: z.number().nonnegative().nullable().optional(),
   presupuesto_max: z.number().nonnegative().nullable().optional(),
+  respuestas_test: z.record(z.any()).optional(),
   persistir: z.boolean().optional().default(true),
 });
 
