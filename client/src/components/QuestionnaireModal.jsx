@@ -18,22 +18,32 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUIZ_QUESTIONS, DIMENSION_WEIGHTS } from '../data/personalityQuiz';
 
-// Mapeo de animaciones y personajes de cultura pop por dimensión
-const DIMENSION_GIFS = {
-  universos: '/gifs/pixel-hero.gif',
-  categorias: '/gifs/gemini-relic.gif',
-  personajes: '/gifs/sprite-02.gif',
-  eventos: '/gifs/pixel-arcade.gif',
-  nostalgia: '/gifs/80s-vintage.gif',
-  rareza: '/gifs/sprite-01.gif',
-  motivacion: '/gifs/sprite-03.gif',
+// Mapeo curado de animaciones y personajes de la cultura pop para las 20 preguntas
+const QUESTION_GIFS = {
+  1: '/gifs/pixel-hero.gif',      // Universos Galácticos / Sci-Fi
+  2: '/gifs/gemini-relic.gif',    // Vitrina de Reliquias / Formatos
+  3: '/gifs/asuna-sao.gif',       // Personajes Magnéticos / Anime & Manga (Asuna SAO)
+  4: '/gifs/pixel-arcade.gif',    // Momentos Épicos / Batallas
+  5: '/gifs/retro-anime.gif',     // Cómics y Novelas Gráficas
+  6: '/gifs/gemini-relic.gif',    // Conservación y Grado de Vitrina
+  7: '/gifs/80s-vintage.gif',     // Atmósfera Nostálgica Años 80
+  8: '/gifs/ben-10.gif',          // Héroes & Vehículos / Sci-Fi (Ben 10)
+  9: '/gifs/pixel-arcade.gif',    // Videojuegos Retro Arcade
+  10: '/gifs/sprite-01.gif',      // Rareza Absoluta y Griales
+  11: '/gifs/pixel-hero.gif',     // Ciencia Ficción Galáctica
+  12: '/gifs/gemini-relic.gif',    // Cartas Coleccionables TCG
+  13: '/gifs/ben-10.gif',          // Superhéroes y Arquetipos Legendarios
+  14: '/gifs/asuna-sao.gif',       // Grandes Rivalidades y Duelos
+  15: '/gifs/90s-nostalgia.gif',  // Nostalgia de la Época de los 90
+  16: '/gifs/miku.gif',           // Cultura Pop, Figuras de Diseño & Música (Hatsune Miku)
+  17: '/gifs/sprite-01.gif',      // Condición y Grado AFA/PSA
+  18: '/gifs/pixel-hero.gif',     // Hitos de la Cultura Pop
+  19: '/gifs/gemini-relic.gif',    // Inversión y Alta Gama
+  20: '/gifs/sprite-03.gif',      // Filosofía del Custodio y Coleccionista
 };
 
-const getQuestionGif = (dimension, step) => {
-  if (dimension === 'nostalgia') {
-    return step % 2 === 0 ? '/gifs/80s-vintage.gif' : '/gifs/90s-nostalgia.gif';
-  }
-  return DIMENSION_GIFS[dimension] || '/gifs/sprite-01.gif';
+const getQuestionGif = (questionId, dimension, step) => {
+  return QUESTION_GIFS[questionId] || (dimension === 'nostalgia' ? (step % 2 === 0 ? '/gifs/80s-vintage.gif' : '/gifs/90s-nostalgia.gif') : '/gifs/sprite-01.gif');
 };
 
 export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentPreferences }) {
@@ -316,10 +326,10 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
                   )}
                 </div>
 
-                {/* Pop-Culture Animated Character Badge (Formato natural, sin zoom artificial) */}
+                {/* Pop-Culture Animated Character Badge (Resolución natural 1:1, sin zoom artificial) */}
                 <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 p-1.5 rounded-2xl bg-noir-950/90 border border-gold-500/30 shadow-luxury overflow-hidden flex items-center justify-center">
                   <img
-                    src={getQuestionGif(currentQ.dimension, currentStep)}
+                    src={getQuestionGif(currentQ.id, currentQ.dimension, currentStep)}
                     alt="Animación de Cultura Pop"
                     className="max-w-full max-h-full object-contain rounded-xl"
                     onError={(e) => {
