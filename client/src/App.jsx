@@ -10,8 +10,18 @@ import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AuthModal from './components/AuthModal';
 import SellerDashboard from './components/SellerDashboard';
+import ResetPasswordModal from './components/ResetPasswordModal';
 import api from './services/api';
 import { ShieldCheck, Lock, Sparkles, Award } from 'lucide-react';
+
+// Piezas por página del catálogo (múltiplo de 3 para la grilla).
+const PAGE_SIZE = 12;
+
+// Lee el token del enlace de recuperación enviado por correo (/reset-password?token=...).
+const readResetTokenFromUrl = () => {
+  if (window.location.pathname !== '/reset-password') return null;
+  return new URLSearchParams(window.location.search).get('token');
+};
 
 export default function App() {
   // Estado de Usuario & Auth (GUS)
@@ -22,6 +32,8 @@ export default function App() {
   // Estado de Catálogo & Filtros (CAT)
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
   const [filters, setFilters] = useState({
     search: '',
     franquicia: '',
@@ -39,6 +51,12 @@ export default function App() {
   const [activePreferences, setActivePreferences] = useState(null);
   const [profileAnalysis, setProfileAnalysis] = useState(null);
   const [questionnaireOpen, setQuestionnaireOpen] = useState(false);
+  // Último cuestionario enviado en esta sesión: permite paginar con el mismo ranking
+  // (para visitantes no se persiste, y el perfil multidimensional no se guarda en BD).
+  const [quizPayload, setQuizPayload] = useState(null);
+
+  // Recuperación de contraseña (RF-03)
+  const [resetToken, setResetToken] = useState(readResetTokenFromUrl);
 
   // Estado de Detalle de Producto & Contexto Histórico (CU-05 / CH)
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -124,6 +142,17 @@ export default function App() {
   }, [user]);
 
   // 4. Cargar Catálogo o Recomendaciones
+  const applyRecommendationResult = (data) => {
+    setProducts(data.recommendations);
+    setPagination(data.pagination);
+    if (data.preferences_applied) {
+      setActivePreferences(data.preferences_applied);
+    }
+    if (data.profile_analysis) {
+      setProfileAnalysis(data.profile_analysis);
+    }
+  };
+
   const fetchCatalogOrRecommendations = async () => {
     setLoadingProducts(true);
     try {
@@ -134,8 +163,10 @@ export default function App() {
         filters.decada ||
         filters.precio_max;
 
+      const pageParams = { page, limit: PAGE_SIZE };
+
       if (hasDirectFilters) {
-        const params = {};
+        const params = { ...pageParams };
         if (filters.search) params.search = filters.search;
         if (filters.franquicia) params.franquicia = filters.franquicia;
         if (filters.categoria) params.categoria = filters.categoria;
@@ -144,15 +175,18 @@ export default function App() {
 
         const res = await api.get('/products', { params });
         setProducts(res.data.data);
+        setPagination(res.data.pagination);
+      } else if (quizPayload) {
+        // Re-evalúa el mismo cuestionario sin volver a guardarlo, para paginar el mismo ranking.
+        const res = await api.post(
+          '/recommendations/questionnaire',
+          { ...quizPayload, persistir: false },
+          { params: pageParams }
+        );
+        applyRecommendationResult(res.data.data);
       } else {
-        const res = await api.get('/recommendations');
-        setProducts(res.data.data.recommendations);
-        if (res.data.data.preferences_applied) {
-          setActivePreferences(res.data.data.preferences_applied);
-        }
-        if (res.data.data.profile_analysis) {
-          setProfileAnalysis(res.data.data.profile_analysis);
-        }
+        const res = await api.get('/recommendations', { params: pageParams });
+        applyRecommendationResult(res.data.data);
       }
     } catch (error) {
       console.error('Error al cargar catálogo:', error);
@@ -164,7 +198,18 @@ export default function App() {
 
   useEffect(() => {
     fetchCatalogOrRecommendations();
-  }, [filters, user]);
+  }, [filters, user, page]);
+
+  // Cualquier cambio de filtros vuelve a la primera página.
+  const updateFilters = (updater) => {
+    setFilters(updater);
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    scrollToCatalog();
+  };
 
   // 5. Detalle de Producto & Contexto Histórico (CU-05)
   const handleSelectProduct = async (id) => {
@@ -229,12 +274,14 @@ export default function App() {
   // 7. Cuestionario de Recomendación (RF-09 / CU-06)
   const handleQuestionnaireSubmit = async (prefData) => {
     try {
-      const res = await api.post('/recommendations/questionnaire', prefData);
+      const res = await api.post('/recommendations/questionnaire', prefData, {
+        params: { page: 1, limit: PAGE_SIZE },
+      });
+      const { persistir, ...payload } = prefData;
+      setQuizPayload(payload);
+      applyRecommendationResult(res.data.data);
       setActivePreferences(res.data.data.preferences_applied);
-      setProducts(res.data.data.recommendations);
-      if (res.data.data.profile_analysis) {
-        setProfileAnalysis(res.data.data.profile_analysis);
-      }
+      setPage(1);
       setQuestionnaireOpen(false);
       showToast('¡Calibración exitosa! Archivo ordenado por afinidad arqueológica.', 'success');
     } catch (err) {
@@ -286,7 +333,28 @@ export default function App() {
     setUser(null);
     setCart({ items: [], total: 0, count: 0 });
     setActivePreferences(null);
+    setProfileAnalysis(null);
+    setQuizPayload(null);
+    setPage(1);
     showToast('Sesión cerrada con seguridad.', 'info');
+  };
+
+  // 10. Recuperación de contraseña (RF-03)
+  const handleForgotPassword = async (correo_electronico) => {
+    const res = await api.post('/auth/forgot-password', { correo_electronico });
+    return res.data.message;
+  };
+
+  const handleResetPassword = async (nueva_contrasena) => {
+    const res = await api.post('/auth/reset-password', { token: resetToken, nueva_contrasena });
+    return res.data.message;
+  };
+
+  const closeResetPassword = (openLogin = false) => {
+    setResetToken(null);
+    // Quita el token de la barra de direcciones para que no quede en el historial.
+    window.history.replaceState(null, '', '/');
+    if (openLogin) setAuthModalOpen(true);
   };
 
   const scrollToCatalog = () => {
@@ -324,11 +392,11 @@ export default function App() {
         user={user}
         onLogout={handleLogout}
         onSelectFranchiseFilter={(f) => {
-          setFilters((prev) => ({ ...prev, franquicia: f }));
+          updateFilters((prev) => ({ ...prev, franquicia: f }));
           scrollToCatalog();
         }}
         onSelectCategoryFilter={(c) => {
-          setFilters((prev) => ({ ...prev, categoria: c }));
+          updateFilters((prev) => ({ ...prev, categoria: c }));
           scrollToCatalog();
         }}
         franchises={filterMeta.franquicias}
@@ -341,7 +409,7 @@ export default function App() {
         <HeroEditorial
           onOpenQuestionnaire={() => setQuestionnaireOpen(true)}
           onExploreCatalog={scrollToCatalog}
-          featuredCount={products.length || 42}
+          featuredCount={pagination.total || 42}
         />
 
         {/* Horizontal Featured Collectibles Carousel */}
@@ -363,7 +431,9 @@ export default function App() {
           products={products}
           filters={filters}
           metadata={filterMeta}
-          onFilterChange={(key, val) => setFilters({ ...filters, [key]: val })}
+          onFilterChange={(key, val) => updateFilters((prev) => ({ ...prev, [key]: val }))}
+          pagination={pagination}
+          onPageChange={handlePageChange}
           onSelectProduct={handleSelectProduct}
           onAddToCart={(prodId) => handleAddToCart(prodId, 1)}
           loading={loadingProducts}
@@ -424,7 +494,14 @@ export default function App() {
         onClose={() => setAuthModalOpen(false)}
         onLogin={handleLogin}
         onRegister={handleRegister}
+        onForgotPassword={handleForgotPassword}
         loading={authLoading}
+      />
+
+      <ResetPasswordModal
+        isOpen={!!resetToken}
+        onClose={closeResetPassword}
+        onSubmit={handleResetPassword}
       />
 
       <SellerDashboard

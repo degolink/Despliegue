@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, ShieldCheck, Calendar, Sparkles, Layers, Box, Tag, ArrowUpRight, Flame } from 'lucide-react';
+import { Search, Filter, ShieldCheck, Calendar, Sparkles, Layers, Box, Tag, ArrowUpRight, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Catalog({
@@ -10,7 +10,13 @@ export default function Catalog({
   onSelectProduct,
   onAddToCart,
   loading,
+  pagination = { total: 0, page: 1, totalPages: 1 },
+  onPageChange,
 }) {
+  const totalItems = pagination.total || products.length;
+  const currentPage = pagination.page || 1;
+  const totalPages = Math.max(1, pagination.totalPages || 1);
+
   return (
     <div id="catalog-section" className="scroll-mt-24">
       {/* Editorial Catalog Header */}
@@ -29,7 +35,8 @@ export default function Catalog({
         </div>
 
         <div className="text-xs font-mono text-platinum-400">
-          Mostrando <span className="text-gold-400 font-bold">{products.length}</span> piezas certificadas
+          Mostrando <span className="text-gold-400 font-bold">{products.length}</span> de{' '}
+          <span className="text-gold-400 font-bold">{totalItems}</span> piezas certificadas
         </div>
       </div>
 
@@ -257,6 +264,49 @@ export default function Catalog({
             );
           })}
         </div>
+      )}
+
+      {/* Pagination Controls */}
+      {!loading && totalPages > 1 && (
+        <nav
+          aria-label="Paginación del catálogo"
+          className="mt-12 flex flex-wrap items-center justify-center gap-3 font-mono text-xs"
+        >
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-noir-900 border border-white/10 hover:border-gold-500/40 text-platinum-300 hover:text-white transition-all disabled:opacity-30 disabled:pointer-events-none"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="uppercase tracking-widest">Anterior</span>
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => onPageChange(n)}
+                aria-current={n === currentPage ? 'page' : undefined}
+                className={`w-9 h-9 rounded-lg border transition-all ${
+                  n === currentPage
+                    ? 'bg-gold-500 border-gold-400 text-noir-950 font-black'
+                    : 'bg-noir-900 border-white/10 text-platinum-300 hover:border-gold-500/40 hover:text-white'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-noir-900 border border-white/10 hover:border-gold-500/40 text-platinum-300 hover:text-white transition-all disabled:opacity-30 disabled:pointer-events-none"
+          >
+            <span className="uppercase tracking-widest">Siguiente</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </nav>
       )}
     </div>
   );

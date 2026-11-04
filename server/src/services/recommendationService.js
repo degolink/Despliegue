@@ -316,6 +316,7 @@ class RecommendationService {
     usuarioId = null,
     customPreferences = null,
     respuestas_test = null,
+    page = 1,
     limit = 20,
   }) {
     const pool = await getPool();
@@ -413,11 +414,18 @@ class RecommendationService {
       return new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion);
     });
 
+    // Paginación sobre el ranking completo: el orden por afinidad se calcula una sola vez
+    // sobre todo el catálogo, de modo que la página 2 continúa exactamente donde acaba la 1.
+    const total = scoredProducts.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const offset = (page - 1) * limit;
+
     return {
-      total: scoredProducts.length,
+      total,
       preferences_applied: preferences || null,
       profile_analysis: profileAnalysis,
-      recommendations: scoredProducts.slice(0, limit),
+      recommendations: scoredProducts.slice(offset, offset + limit),
+      pagination: { total, page, limit, totalPages },
     };
   }
 
@@ -425,7 +433,7 @@ class RecommendationService {
    * Guarda o actualiza las preferencias de un usuario en base de datos (RF-09 / CU-06)
    * Respeta al 100% las tablas y columnas existentes en SQL Server
    */
-  async saveUserPreferences(usuarioId, preferencesData) {
+  async saveUserPreferences(usuarioId, preferencesData, { page = 1, limit = 20 } = {}) {
     const {
       franquicia_interes,
       categoria_preferida,
@@ -475,7 +483,7 @@ class RecommendationService {
       .input('presupuesto_max', sql.Decimal(10, 2), presupuesto_max != null ? presupuesto_max : null)
       .query(query);
 
-    return this.getRecommendations({ usuarioId, respuestas_test });
+    return this.getRecommendations({ usuarioId, respuestas_test, page, limit });
   }
 }
 

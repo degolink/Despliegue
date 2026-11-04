@@ -1,5 +1,11 @@
 const recommendationService = require('../services/recommendationService');
 
+/** Lee ?page y ?limit con valores seguros (nunca NaN, límite máximo 50). */
+const parsePagination = (query) => ({
+  page: Math.max(1, parseInt(query.page, 10) || 1),
+  limit: Math.min(50, Math.max(1, parseInt(query.limit, 10) || 20)),
+});
+
 /**
  * Obtener feed de recomendaciones personalizadas
  * GET /api/recommendations
@@ -7,10 +13,11 @@ const recommendationService = require('../services/recommendationService');
 const getRecommendations = async (req, res, next) => {
   try {
     const usuarioId = req.user ? req.user.usuario_id : null;
-    const limit = parseInt(req.query.limit, 10) || 20;
+    const { page, limit } = parsePagination(req.query);
 
     const result = await recommendationService.getRecommendations({
       usuarioId,
+      page,
       limit,
     });
 
@@ -42,6 +49,7 @@ const submitQuestionnaire = async (req, res, next) => {
       persistir = true,
     } = req.body;
 
+    const { page, limit } = parsePagination(req.query);
     let result;
 
     // Si el usuario está autenticado y se solicita persistir, guardamos en PREFERENCIAS_USUARIO
@@ -53,7 +61,7 @@ const submitQuestionnaire = async (req, res, next) => {
         presupuesto_min,
         presupuesto_max,
         respuestas_test,
-      });
+      }, { page, limit });
     } else {
       // Cálculo dinámico para visitantes o previsualización sin alterar preferencias guardadas
       result = await recommendationService.getRecommendations({
@@ -65,6 +73,8 @@ const submitQuestionnaire = async (req, res, next) => {
           presupuesto_max,
         },
         respuestas_test,
+        page,
+        limit,
       });
     }
 

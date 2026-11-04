@@ -60,8 +60,8 @@ const getProducts = async (req, res, next) => {
     const sortField = allowedSort.includes(sort_by) ? `p.${sort_by}` : 'p.fecha_publicacion';
     const sortDirection = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-    const pageNum = Math.max(1, parseInt(page, 10));
-    const limitNum = Math.max(1, Math.min(50, parseInt(limit, 10)));
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(50, parseInt(limit, 10) || 12));
     const offset = (pageNum - 1) * limitNum;
 
     request.input('offset', sql.Int, offset);
