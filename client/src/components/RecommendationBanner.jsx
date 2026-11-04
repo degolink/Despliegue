@@ -1,6 +1,14 @@
 import React from 'react';
 import { Sparkles, Target, Award, DollarSign, RefreshCw, Zap, ShieldCheck, Compass, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+  Tooltip,
+} from 'recharts';
 
 export default function RecommendationBanner({ preferences, profileAnalysis, onRetakeQuiz }) {
   if (!preferences && !profileAnalysis) return null;
@@ -62,32 +70,72 @@ export default function RecommendationBanner({ preferences, profileAnalysis, onR
         </button>
       </div>
 
-      {/* Multidimensional Dimensions Radar Chips if available */}
+      {/* Multidimensional Dimensions Radar Chart & Chips if available */}
       {profileAnalysis?.dimensionPercentages && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-5 pt-5 border-t border-white/[0.06] relative z-10 text-[11px] font-mono">
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Universos (25%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.universos}%</span>
+        <div className="mt-5 pt-5 border-t border-white/[0.06] relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="h-48 w-full bg-noir-950/60 rounded-2xl border border-white/5 p-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart
+                cx="50%"
+                cy="50%"
+                outerRadius="70%"
+                data={[
+                  { dimension: 'Universos', valor: profileAnalysis.dimensionPercentages.universos },
+                  { dimension: 'Categorías', valor: profileAnalysis.dimensionPercentages.categorias },
+                  { dimension: 'Personajes', valor: profileAnalysis.dimensionPercentages.personajes },
+                  { dimension: 'Eventos', valor: profileAnalysis.dimensionPercentages.eventos },
+                  { dimension: 'Nostalgia', valor: profileAnalysis.dimensionPercentages.nostalgia },
+                  { dimension: 'Rareza', valor: profileAnalysis.dimensionPercentages.rareza },
+                ]}
+              >
+                <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                <PolarAngleAxis dataKey="dimension" tick={{ fill: '#E2E8F0', fontSize: 10 }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0A0A0C',
+                    borderColor: 'rgba(212, 175, 55, 0.4)',
+                    borderRadius: '10px',
+                    fontSize: '11px',
+                    color: '#FFFFFF',
+                  }}
+                  formatter={(val) => [`${val}%`, 'Afinidad']}
+                />
+                <Radar
+                  name="Perfil"
+                  dataKey="valor"
+                  stroke="#D4AF37"
+                  fill="#D4AF37"
+                  fillOpacity={0.35}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Categorías (25%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.categorias}%</span>
-          </div>
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Personajes (15%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.personajes}%</span>
-          </div>
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Eventos (15%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.eventos}%</span>
-          </div>
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Nostalgia (10%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.nostalgia}%</span>
-          </div>
-          <div className="p-2 rounded-xl bg-noir-950/60 border border-white/5">
-            <span className="text-platinum-500 block text-[9px] uppercase">Rareza (10%)</span>
-            <span className="text-gold-400 font-bold">{profileAnalysis.dimensionPercentages.rareza}%</span>
+
+          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-[11px] font-mono">
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Universos (25%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.universos}%</span>
+            </div>
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Categorías (25%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.categorias}%</span>
+            </div>
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Personajes (15%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.personajes}%</span>
+            </div>
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Eventos (15%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.eventos}%</span>
+            </div>
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Nostalgia (10%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.nostalgia}%</span>
+            </div>
+            <div className="p-3 rounded-xl bg-noir-950/60 border border-white/5">
+              <span className="text-platinum-500 block text-[9px] uppercase">Rareza (10%)</span>
+              <span className="text-gold-400 font-bold text-sm">{profileAnalysis.dimensionPercentages.rareza}%</span>
+            </div>
           </div>
         </div>
       )}

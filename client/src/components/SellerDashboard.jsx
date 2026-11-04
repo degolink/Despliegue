@@ -21,7 +21,24 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import api from '../services/api';
+
+const GOLD_PALETTE = ['#D4AF37', '#F3E5AB', '#AA771C', '#94A3B8', '#64748B', '#E5C158'];
 
 export default function SellerDashboard({ isOpen, onClose, user }) {
   if (!isOpen) return null;
@@ -316,27 +333,53 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
                           Sin transacciones en este rango de tiempo.
                         </div>
                       ) : (
-                        <div className="space-y-2">
-                          {trends.slice(-5).map((t) => {
-                            const maxVal = Math.max(...trends.map((x) => x.ventas)) || 1;
-                            const pct = Math.round((t.ventas / maxVal) * 100);
-                            return (
-                              <div key={t.fecha} className="space-y-1">
-                                <div className="flex justify-between text-xs font-mono text-platinum-300">
-                                  <span>{t.fecha}</span>
-                                  <span className="text-gold-300 font-bold">
-                                    ${Number(t.ventas).toLocaleString('en-US')} ({t.ordenes} ord.)
-                                  </span>
-                                </div>
-                                <div className="w-full h-2 bg-noir-900 rounded-full overflow-hidden border border-white/5">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-300 rounded-full transition-all duration-500"
-                                    style={{ width: `${pct}%` }}
-                                  />
-                                </div>
-                              </div>
-                            );
-                          })}
+                        <div className="h-52 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={trends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                              <defs>
+                                <linearGradient id="goldRevenueGradient" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.45} />
+                                  <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                              <XAxis
+                                dataKey="fecha"
+                                stroke="#94A3B8"
+                                fontSize={10}
+                                tickLine={false}
+                                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                              />
+                              <YAxis
+                                stroke="#94A3B8"
+                                fontSize={10}
+                                tickLine={false}
+                                axisLine={false}
+                                tickFormatter={(v) => `$${v}`}
+                              />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: '#0A0A0C',
+                                  borderColor: 'rgba(212, 175, 55, 0.4)',
+                                  borderRadius: '12px',
+                                  fontSize: '11px',
+                                  color: '#FFFFFF',
+                                }}
+                                formatter={(value, name) => [
+                                  name === 'ventas' ? `$${Number(value).toLocaleString('en-US')}` : value,
+                                  name === 'ventas' ? 'Ingresos (USD)' : 'Órdenes',
+                                ]}
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="ventas"
+                                stroke="#D4AF37"
+                                strokeWidth={2.5}
+                                fillOpacity={1}
+                                fill="url(#goldRevenueGradient)"
+                              />
+                            </AreaChart>
+                          </ResponsiveContainer>
                         </div>
                       )}
                     </div>
@@ -360,29 +403,94 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
                         No hay registros de ventas para el período seleccionado ({dateRange}).
                       </div>
                     ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left font-mono text-xs">
-                          <thead>
-                            <tr className="border-b border-white/10 text-platinum-400 uppercase tracking-wider text-[10px]">
-                              <th className="py-3 px-4">Fecha</th>
-                              <th className="py-3 px-4">Órdenes</th>
-                              <th className="py-3 px-4">Unidades</th>
-                              <th className="py-3 px-4 text-right">Monto Total</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-white/5">
-                            {trends.map((t) => (
-                              <tr key={t.fecha} className="hover:bg-white/[0.02]">
-                                <td className="py-3 px-4 text-white font-medium">{t.fecha}</td>
-                                <td className="py-3 px-4 text-platinum-300">{t.ordenes}</td>
-                                <td className="py-3 px-4 text-platinum-300">{t.unidades}</td>
-                                <td className="py-3 px-4 text-right text-gold-300 font-bold">
-                                  ${Number(t.ventas).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                                </td>
+                      <div className="space-y-6">
+                        <div className="h-64 w-full p-4 rounded-xl bg-noir-900/70 border border-white/5">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={trends} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                              <XAxis
+                                dataKey="fecha"
+                                stroke="#94A3B8"
+                                fontSize={11}
+                                tickLine={false}
+                                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                              />
+                              <YAxis
+                                yAxisId="left"
+                                stroke="#D4AF37"
+                                fontSize={11}
+                                tickLine={false}
+                                axisLine={false}
+                                tickFormatter={(v) => `$${v}`}
+                              />
+                              <YAxis
+                                yAxisId="right"
+                                orientation="right"
+                                stroke="#94A3B8"
+                                fontSize={11}
+                                tickLine={false}
+                                axisLine={false}
+                              />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: '#0A0A0C',
+                                  borderColor: 'rgba(212, 175, 55, 0.4)',
+                                  borderRadius: '12px',
+                                  fontSize: '11px',
+                                  color: '#FFFFFF',
+                                }}
+                                formatter={(value, name) => [
+                                  name === 'Facturación (USD)'
+                                    ? `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+                                    : value,
+                                  name,
+                                ]}
+                              />
+                              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                              <Bar
+                                yAxisId="left"
+                                dataKey="ventas"
+                                name="Facturación (USD)"
+                                fill="#D4AF37"
+                                radius={[6, 6, 0, 0]}
+                                maxBarSize={48}
+                              />
+                              <Bar
+                                yAxisId="right"
+                                dataKey="unidades"
+                                name="Unidades Vendidas"
+                                fill="#94A3B8"
+                                radius={[6, 6, 0, 0]}
+                                maxBarSize={32}
+                              />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left font-mono text-xs">
+                            <thead>
+                              <tr className="border-b border-white/10 text-platinum-400 uppercase tracking-wider text-[10px]">
+                                <th className="py-3 px-4">Fecha</th>
+                                <th className="py-3 px-4">Órdenes</th>
+                                <th className="py-3 px-4">Unidades</th>
+                                <th className="py-3 px-4 text-right">Monto Total</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                              {trends.map((t) => (
+                                <tr key={t.fecha} className="hover:bg-white/[0.02]">
+                                  <td className="py-3 px-4 text-white font-medium">{t.fecha}</td>
+                                  <td className="py-3 px-4 text-platinum-300">{t.ordenes}</td>
+                                  <td className="py-3 px-4 text-platinum-300">{t.unidades}</td>
+                                  <td className="py-3 px-4 text-right text-gold-300 font-bold">
+                                    ${Number(t.ventas).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -494,14 +602,87 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
                     </div>
                   </div>
 
-                  {/* Category Distribution */}
+                  {/* Category Distribution with Recharts Pie & Top Products BarChart */}
                   <div className="p-6 rounded-2xl bg-noir-950/80 border border-white/10">
                     <h3 className="font-serif text-base font-bold text-white mb-1">
                       Distribución por Formato de Coleccionable
                     </h3>
-                    <p className="text-xs text-platinum-400 mb-4 font-light">
+                    <p className="text-xs text-platinum-400 mb-6 font-light">
                       Participación de cada categoría en la facturación de tu bóveda.
                     </p>
+
+                    {(products.category_distribution || []).length > 0 && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center mb-6">
+                        <div className="h-60 w-full bg-noir-900/60 rounded-xl border border-white/5 p-3">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={products.category_distribution}
+                                dataKey="ingresos_totales"
+                                nameKey="categoria"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={50}
+                                outerRadius={80}
+                                paddingAngle={4}
+                              >
+                                {products.category_distribution.map((entry, idx) => (
+                                  <Cell key={`cell-${idx}`} fill={GOLD_PALETTE[idx % GOLD_PALETTE.length]} />
+                                ))}
+                              </Pie>
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: '#0A0A0C',
+                                  borderColor: 'rgba(212, 175, 55, 0.4)',
+                                  borderRadius: '12px',
+                                  fontSize: '11px',
+                                  color: '#FFFFFF',
+                                }}
+                                formatter={(value) => [`$${Number(value).toLocaleString('en-US')}`, 'Ingresos']}
+                              />
+                              <Legend wrapperStyle={{ fontSize: '11px' }} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        <div className="h-60 w-full bg-noir-900/60 rounded-xl border border-white/5 p-3">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={(products.top_selling_products || []).slice(0, 5)}
+                              layout="vertical"
+                              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                              <XAxis
+                                type="number"
+                                stroke="#94A3B8"
+                                fontSize={10}
+                                tickFormatter={(v) => `$${v}`}
+                              />
+                              <YAxis
+                                type="category"
+                                dataKey="nombre"
+                                stroke="#E2E8F0"
+                                fontSize={10}
+                                width={110}
+                                tickFormatter={(val) => (val.length > 15 ? `${val.slice(0, 15)}…` : val)}
+                              />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: '#0A0A0C',
+                                  borderColor: 'rgba(212, 175, 55, 0.4)',
+                                  borderRadius: '12px',
+                                  fontSize: '11px',
+                                  color: '#FFFFFF',
+                                }}
+                                formatter={(value) => [`$${Number(value).toLocaleString('en-US')}`, 'Facturación']}
+                              />
+                              <Bar dataKey="ingresos_generados" fill="#D4AF37" radius={[0, 6, 6, 0]} barSize={20} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {(products.category_distribution || []).map((cat) => (
@@ -570,6 +751,41 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
                     <p className="text-xs text-platinum-400 mb-4 font-light">
                       Agrupaciones de compradores computadas según volumen de gasto y formatos adquiridos.
                     </p>
+
+                    {(customerIntel.segments || []).length > 0 && (
+                      <div className="h-52 w-full mb-4 p-4 rounded-2xl bg-noir-950/80 border border-white/10">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={customerIntel.segments} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                            <XAxis
+                              dataKey="nombre"
+                              stroke="#94A3B8"
+                              fontSize={10}
+                              tickLine={false}
+                              tickFormatter={(val) => (val.length > 18 ? `${val.slice(0, 18)}…` : val)}
+                            />
+                            <YAxis
+                              stroke="#D4AF37"
+                              fontSize={10}
+                              tickLine={false}
+                              axisLine={false}
+                              tickFormatter={(v) => `$${v}`}
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: '#0A0A0C',
+                                borderColor: 'rgba(212, 175, 55, 0.4)',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                color: '#FFFFFF',
+                              }}
+                              formatter={(value) => [`$${Number(value).toLocaleString('en-US')}`, 'Monto Acumulado']}
+                            />
+                            <Bar dataKey="monto_acumulado" fill="#D4AF37" radius={[6, 6, 0, 0]} maxBarSize={44} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {(customerIntel.segments || []).map((seg) => {
