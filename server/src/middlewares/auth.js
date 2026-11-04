@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { getPool, sql } = require('../config/db');
+const { getJwtSecret } = require('../config/jwt');
 
 /**
  * Middleware para verificar JWT y autenticar usuario
@@ -15,7 +16,7 @@ const authenticateJWT = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secret_mythic_shelf_jwt_key_2024_secure!');
+    const decoded = jwt.verify(token, getJwtSecret());
 
     const pool = await getPool();
     const result = await pool
@@ -69,7 +70,7 @@ const optionalJWT = async (req, res, next) => {
       return next();
     }
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secret_mythic_shelf_jwt_key_2024_secure!');
+    const decoded = jwt.verify(token, getJwtSecret());
     const pool = await getPool();
     const result = await pool
       .request()

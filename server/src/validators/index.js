@@ -8,7 +8,9 @@ const registerSchema = z.object({
     .string()
     .min(6, 'La contraseña debe tener al menos 6 caracteres')
     .max(100),
-  rol: z.enum(['Comprador', 'Vendedor', 'Administrador']).optional().default('Comprador'),
+  // El rol Administrador nunca se puede autoasignar en el registro público:
+  // solo se otorga directamente en la base de datos.
+  rol: z.enum(['Comprador', 'Vendedor']).optional().default('Comprador'),
 });
 
 // Validación de Login

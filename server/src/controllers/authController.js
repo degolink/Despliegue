@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { getPool, sql } = require('../config/db');
+const { getJwtSecret } = require('../config/jwt');
 const { sendWelcomeEmail, sendPasswordResetEmail } = require('../config/mailer');
 
 /**
@@ -52,7 +53,7 @@ const register = async (req, res, next) => {
     // Generar JWT
     const token = jwt.sign(
       { usuario_id: newUser.usuario_id, rol: newUser.rol },
-      process.env.JWT_SECRET || 'super_secret_mythic_shelf_jwt_key_2024_secure!',
+      getJwtSecret(),
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
@@ -112,7 +113,7 @@ const login = async (req, res, next) => {
 
     const token = jwt.sign(
       { usuario_id: user.usuario_id, rol: user.rol },
-      process.env.JWT_SECRET || 'super_secret_mythic_shelf_jwt_key_2024_secure!',
+      getJwtSecret(),
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 

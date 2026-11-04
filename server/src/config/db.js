@@ -2,8 +2,8 @@ const sql = require('mssql');
 require('dotenv').config();
 
 const dbConfig = {
-  user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || 'YourStrongPassword123!',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   server: process.env.DB_SERVER || 'localhost',
   port: parseInt(process.env.DB_PORT, 10) || 1433,
   database: process.env.DB_NAME || 'MythicShelfDB',

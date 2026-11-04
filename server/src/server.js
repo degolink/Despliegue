@@ -3,7 +3,36 @@ const { getPool } = require('./config/db');
 
 const PORT = process.env.PORT || 5000;
 
+// Secretos publicados en el repositorio (ejemplos antiguos): nunca deben usarse en producción.
+const KNOWN_INSECURE_JWT_SECRETS = ['super_secret_mythic_shelf_jwt_key_2024_secure!'];
+
+/**
+ * Verifica la configuración sensible antes de aceptar tráfico.
+ * Sin valores por defecto: si falta algo, el servidor no arranca.
+ */
+const validateEnvironment = () => {
+  const missing = ['JWT_SECRET', 'DB_USER', 'DB_PASSWORD'].filter((key) => !process.env[key]);
+  if (missing.length > 0) {
+    console.error(`❌ Faltan variables obligatorias en server/.env: ${missing.join(', ')}`);
+    console.error('   Copie server/.env.example a server/.env y complete los valores.');
+    process.exit(1);
+  }
+
+  const secret = process.env.JWT_SECRET;
+  const isWeak = KNOWN_INSECURE_JWT_SECRETS.includes(secret) || secret.length < 32;
+  if (isWeak) {
+    const msg = 'JWT_SECRET es público o tiene menos de 32 caracteres; cualquiera podría falsificar tokens.';
+    if (process.env.NODE_ENV === 'production') {
+      console.error(`❌ ${msg}`);
+      process.exit(1);
+    }
+    console.warn(`⚠️  ${msg} Genere uno nuevo con:`);
+    console.warn(`   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`);
+  }
+};
+
 const startServer = async () => {
+  validateEnvironment();
   try {
     console.log('⏳ Inicializando Mythic Shelf Backend...');
     
