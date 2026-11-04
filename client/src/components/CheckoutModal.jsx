@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, CheckCircle2, Truck, AlertCircle, ShoppingBag } from 'lucide-react';
+import { X, ShieldCheck, CheckCircle2, Truck, AlertCircle, ShoppingBag, Lock } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout, loading }) {
   if (!isOpen) return null;
 
-  const [direccionEnvio, setDireccionEnvio] = useState('Av. de los Coleccionistas 742, Sector Épico');
-  const [metodoEnvio, setMetodoEnvio] = useState('Estándar Asegurado para Coleccionistas (FedEx Priority)');
+  const [direccionEnvio, setDireccionEnvio] = useState('Bóveda Residencial Privada, Distrito Capital');
+  const [metodoEnvio, setMetodoEnvio] = useState('Custodia Blindada Priority (Seguro y Seguimiento Satelital)');
   const [receipt, setReceipt] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -19,7 +20,7 @@ export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout
       });
       setReceipt(response);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || err.message || 'Error al procesar el checkout transaccional.');
+      setErrorMsg(err.response?.data?.message || err.message || 'Error al procesar la transacción atómica.');
     }
   };
 
@@ -29,86 +30,92 @@ export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-lowest/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-xl bg-surface-container border border-white/10 rounded-2xl shadow-2xl shadow-primary-container/20 p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-noir-950/85 backdrop-blur-md animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.25 }}
+        className="relative w-full max-w-xl bg-noir-900 border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-10 max-h-[92vh] overflow-y-auto"
+      >
         <button
           onClick={handleFinish}
-          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-white"
+          className="absolute top-5 right-5 p-2 rounded-full bg-noir-950/80 text-platinum-400 hover:text-white transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
 
         {receipt ? (
-          /* Vista de Confirmación de Compra Transaccional */
+          /* Transaction Success Receipt Plaque */
           <div className="text-center py-4 space-y-4">
-            <div className="w-16 h-16 bg-tertiary/20 border-2 border-tertiary rounded-full flex items-center justify-center mx-auto text-tertiary">
-              <CheckCircle2 className="w-10 h-10" />
+            <div className="w-16 h-16 bg-gold-500/10 border-2 border-gold-400 rounded-full flex items-center justify-center mx-auto text-gold-400 shadow-gold-glow">
+              <CheckCircle2 className="w-8 h-8" />
             </div>
 
-            <h2 className="text-2xl font-black text-on-surface font-mythic">
-              ¡Transacción Confirmada!
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-wide">
+              Adquisición Confirmada
             </h2>
-            <p className="text-xs text-on-surface-variant max-w-md mx-auto">
-              La orden <strong className="text-secondary font-mono">#{receipt.orden_id}</strong> fue registrada atómicamente en SQL Server. El inventario ha sido actualizado y se emitieron los certificados de resguardo.
+            <p className="text-xs text-platinum-400 max-w-md mx-auto leading-relaxed font-light">
+              La orden <strong className="text-gold-400 font-mono">#{receipt.orden_id}</strong> fue asentada atómicamente en SQL Server. El inventario ha sido bloqueado y los certificados emitidos.
             </p>
 
-            {/* Recibo */}
-            <div className="bg-surface-low border border-white/10 rounded-xl p-5 text-left text-xs space-y-2.5 mt-4">
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-on-surface-variant">Orden ID:</span>
-                <span className="font-mono text-secondary font-bold">#{receipt.orden_id}</span>
+            {/* Receipt Box */}
+            <div className="bg-noir-950 border border-white/[0.08] rounded-2xl p-6 text-left text-xs font-mono space-y-3 mt-6 shadow-luxury">
+              <div className="flex justify-between border-b border-white/[0.06] pb-2.5">
+                <span className="text-platinum-500">Número de Orden:</span>
+                <span className="text-gold-400 font-bold">#{receipt.orden_id}</span>
               </div>
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-on-surface-variant">Fecha y Hora:</span>
-                <span className="text-on-surface">{new Date(receipt.fecha_orden).toLocaleString()}</span>
+              <div className="flex justify-between border-b border-white/[0.06] pb-2.5">
+                <span className="text-platinum-500">Fecha y Hora UTC:</span>
+                <span className="text-platinum-200">{new Date(receipt.fecha_orden).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-on-surface-variant">Destino de Envío:</span>
-                <span className="text-on-surface">{receipt.direccion_envio}</span>
+              <div className="flex justify-between border-b border-white/[0.06] pb-2.5">
+                <span className="text-platinum-500">Dirección de Custodia:</span>
+                <span className="text-platinum-200 truncate max-w-[240px]">{receipt.direccion_envio}</span>
               </div>
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-on-surface-variant">Logística Especial:</span>
-                <span className="text-on-surface">{receipt.metodo_envio}</span>
+              <div className="flex justify-between border-b border-white/[0.06] pb-2.5">
+                <span className="text-platinum-500">Logística de Envío:</span>
+                <span className="text-platinum-200 truncate max-w-[240px]">{receipt.metodo_envio}</span>
               </div>
-              <div className="flex justify-between pt-1 text-sm font-bold">
-                <span className="text-on-surface">Total Liquidado:</span>
-                <span className="text-secondary font-mono text-base">
-                  ${Number(receipt.total).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              <div className="flex justify-between pt-2 text-sm font-bold">
+                <span className="font-serif text-white uppercase tracking-wider text-xs">Total Liquidado:</span>
+                <span className="font-serif text-gold-400 text-lg">
+                  ${Number(receipt.total).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
                 </span>
               </div>
             </div>
 
             <button
               onClick={handleFinish}
-              className="mt-6 w-full py-3 rounded-lg bg-primary-container hover:bg-primary-dark text-white font-bold text-sm tracking-wider uppercase transition-all shadow-lg shadow-primary-container/40"
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 hover:from-gold-400 hover:to-gold-300 text-noir-950 font-black text-xs uppercase tracking-widest transition-all shadow-gold-glow"
             >
-              Cerrar y Continuar Explorando
+              Cerrar Comprobante
             </button>
           </div>
         ) : (
-          /* Formulario de Checkout (CU-08) */
+          /* Checkout Form */
           <div>
-            <div className="flex items-center space-x-2 text-primary text-xs font-bold uppercase tracking-wider mb-1">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center space-x-2 text-gold-400 text-[10px] font-mono font-bold uppercase tracking-widest mb-1.5">
+              <Lock className="w-3.5 h-3.5 text-gold-500" />
               <span>Checkout Transaccional Blindado (ACID)</span>
             </div>
-            <h2 className="text-2xl font-black text-on-surface font-mythic mb-2">
-              Finalizar Pedido
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 tracking-wide">
+              Finalizar Adquisición
             </h2>
-            <p className="text-xs text-on-surface-variant mb-6">
-              Tus artículos serán reservados mediante bloqueo de fila en base de datos para garantizar disponibilidad inmediata.
+            <p className="text-xs text-platinum-400 mb-6 font-light leading-relaxed">
+              Las existencias se bloquean con cerradura de fila (<code className="text-gold-400 font-mono">UPDLOCK</code>) durante el procesamiento.
             </p>
 
             {errorMsg && (
-              <div className="mb-4 p-3 rounded-lg bg-danger-container/30 border border-danger/40 text-danger text-xs flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="mb-5 p-3.5 rounded-xl bg-crimson-600/10 border border-crimson-600/30 text-rose-300 text-xs flex items-center space-x-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-crimson-500" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5">
                   Dirección de Entrega Custodiada
                 </label>
                 <input
@@ -116,25 +123,25 @@ export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout
                   required
                   value={direccionEnvio}
                   onChange={(e) => setDireccionEnvio(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface focus:outline-none focus:border-tertiary"
+                  className="w-full px-4 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-gold-500 font-sans shadow-inner"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1 flex items-center space-x-1">
-                  <Truck className="w-3.5 h-3.5 text-tertiary" />
-                  <span>Método de Envío Asegurado</span>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5 flex items-center space-x-1.5">
+                  <Truck className="w-3.5 h-3.5 text-gold-400" />
+                  <span>Método de Custodia y Logística</span>
                 </label>
                 <select
                   value={metodoEnvio}
                   onChange={(e) => setMetodoEnvio(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface focus:outline-none focus:border-tertiary"
+                  className="w-full px-4 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-platinum-200 focus:outline-none focus:border-gold-500 font-sans cursor-pointer"
                 >
-                  <option value="Estándar Asegurado para Coleccionistas (FedEx Priority)">
-                    Estándar Asegurado para Coleccionistas (FedEx Priority con Seguro de Bóveda)
+                  <option value="Custodia Blindada Priority (Seguro y Seguimiento Satelital)">
+                    Custodia Blindada Priority (Seguro y Seguimiento Satelital)
                   </option>
-                  <option value="Entrega Premium Blindada en Mano (Courier Mythic Direct)">
-                    Entrega Premium Blindada en Mano (Courier Mythic Direct)
+                  <option value="Entrega Premium Personalizada en Mano (Courier Mythic VIP)">
+                    Entrega Premium Personalizada en Mano (Courier Mythic VIP)
                   </option>
                   <option value="Retiro en Cámara Fuerte de Seguridad (Bóveda Central)">
                     Retiro en Cámara Fuerte de Seguridad (Bóveda Central)
@@ -142,15 +149,15 @@ export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout
                 </select>
               </div>
 
-              {/* Resumen de Compra */}
-              <div className="bg-surface-low p-4 rounded-xl border border-white/10 text-xs space-y-2 mt-4">
-                <div className="text-on-surface-variant font-bold uppercase tracking-wider text-[10px]">
-                  Resumen de Bóveda ({cart?.items?.length || 0} coleccionables)
+              {/* Order Summary Plaque */}
+              <div className="bg-noir-950 p-5 rounded-2xl border border-white/[0.08] text-xs font-mono space-y-2.5 mt-5 shadow-luxury">
+                <div className="text-platinum-500 uppercase tracking-widest text-[10px]">
+                  Resumen de Reserva ({cart?.items?.length || 0} piezas)
                 </div>
-                <div className="flex justify-between text-on-surface font-bold pt-2 border-t border-white/10">
-                  <span>Monto Total a Liquidar:</span>
-                  <span className="text-secondary font-mono text-base">
-                    ${Number(cart?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                <div className="flex justify-between text-white font-bold pt-2 border-t border-white/[0.06]">
+                  <span className="font-serif text-platinum-300 uppercase tracking-wider text-xs">Monto Total a Liquidar:</span>
+                  <span className="font-serif text-lg text-gold-400">
+                    ${Number(cart?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
                   </span>
                 </div>
               </div>
@@ -159,15 +166,15 @@ export default function CheckoutModal({ isOpen, onClose, cart, onExecuteCheckout
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary-dark text-white font-black text-sm uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40 disabled:opacity-50"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 hover:from-gold-400 hover:to-gold-300 text-noir-950 font-black text-xs uppercase tracking-widest transition-all shadow-gold-glow disabled:opacity-50"
                 >
-                  {loading ? 'Procesando Transacción en SQL Server...' : 'Confirmar Compra y Bloquear Stock'}
+                  {loading ? 'Confirmando Transacción en SQL Server...' : 'Confirmar y Liquidar Pedido'}
                 </button>
               </div>
             </form>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
--- =====================================================================
+﻿-- =====================================================================
 -- PROYECTO: MYTHIC SHELF - E-COMMERCE B2C DE COLECCIONABLES
 -- SCRIPT DDL: CREACIÓN DE BASE DE DATOS Y TABLAS EN SQL SERVER
 -- Motor: Microsoft SQL Server (2019 / 2022 / Azure SQL)

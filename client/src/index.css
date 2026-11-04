@@ -2,39 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Karmatic Arcade (Vic Fieger, licencia gratuita vía 1001freefonts.com): logo de la marca */
-@font-face {
-  font-family: 'Karmatic Arcade';
-  src: url('./assets/fonts/karmatic-arcade.ttf') format('truetype');
-  font-display: swap;
-}
-
 @layer base {
   body {
-    background-color: #0D1117;
-    color: #E6EDF3;
-    font-family: 'Inter', sans-serif;
+    background-color: #07090C;
+    color: #F0F2F5;
+    font-family: '"Plus Jakarta Sans"', 'Inter', sans-serif;
   }
 
-  /* Títulos en Bangers (estilo cómic); el logo usa font-arcade */
-  h1, h2, h3, .font-mythic {
-    font-family: 'Bangers', 'Inter', sans-serif;
-    letter-spacing: 0.03em;
-    font-weight: 400;
+  h1, h2, h3, .font-editorial {
+    font-family: 'Cinzel', Georgia, serif;
+    letter-spacing: 0.04em;
   }
 }
 
-/* Scrollbar personalizado para coleccionistas */
+/* Custom Luxury Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #11161D;
+  background: #07090C;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2A323D;
-  border-radius: 4px;
+  background: #222936;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #DC2626;
+  background: #C89B2B;
+}
+
+/* Shimmer animation utility */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite;
 }

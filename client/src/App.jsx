@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import HeroEditorial from './components/HeroEditorial';
+import FeaturedCarousel from './components/FeaturedCarousel';
 import RecommendationBanner from './components/RecommendationBanner';
 import Catalog from './components/Catalog';
 import ProductModal from './components/ProductModal';
@@ -8,7 +10,7 @@ import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AuthModal from './components/AuthModal';
 import api from './services/api';
-import { Sparkles, Shield, Compass, BookOpen, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Lock, Sparkles, Award } from 'lucide-react';
 
 export default function App() {
   // Estado de Usuario & Auth (GUS)
@@ -27,9 +29,9 @@ export default function App() {
     precio_max: '',
   });
   const [filterMeta, setFilterMeta] = useState({
-    franquicias: ['Star Wars', 'Pokémon', 'Transformers', 'Nintendo'],
-    categorias: ['Figuras de Acción', 'Cartas TCG', 'Videojuegos Retro', 'Vehículos y Naves'],
-    decadas: ['1970s', '1980s', '1990s'],
+    franquicias: ['Star Wars', 'Pokémon', 'Transformers', 'Nintendo', 'DC Comics', 'Marvel Comics', 'LEGO'],
+    categorias: ['Figuras de Acción', 'Cartas TCG', 'Videojuegos Retro', 'Vehículos y Naves', 'Cómics Vintage'],
+    decadas: ['1970s', '1980s', '1990s', '2000s'],
   });
 
   // Estado de Recomendaciones (REC)
@@ -92,7 +94,7 @@ export default function App() {
           setFilterMeta(res.data.data);
         }
       })
-      .catch((err) => console.warn('Usando metadatos de filtro predeterminados.'));
+      .catch(() => console.warn('Usando metadatos de filtro predeterminados.'));
   }, []);
 
   // 3. Cargar Carrito de Compras si está autenticado
@@ -120,7 +122,6 @@ export default function App() {
   const fetchCatalogOrRecommendations = async () => {
     setLoadingProducts(true);
     try {
-      // Si el usuario aplicó filtros directos en la barra, consultamos endpoint de productos
       const hasDirectFilters =
         filters.search ||
         filters.franquicia ||
@@ -139,7 +140,6 @@ export default function App() {
         const res = await api.get('/products', { params });
         setProducts(res.data.data);
       } else {
-        // Feed con scoring de afinidad (+3 Franquicia, +2 Categoría, +1 Precio)
         const res = await api.get('/recommendations');
         setProducts(res.data.data.recommendations);
         if (res.data.data.preferences_applied) {
@@ -148,7 +148,7 @@ export default function App() {
       }
     } catch (error) {
       console.error('Error al cargar catálogo:', error);
-      showToast('Error al conectar con la base de datos SQL Server.', 'error');
+      showToast('Error de sincronización con la base de datos.', 'error');
     } finally {
       setLoadingProducts(false);
     }
@@ -158,34 +158,34 @@ export default function App() {
     fetchCatalogOrRecommendations();
   }, [filters, user]);
 
-  // 5. Manejo de Selección de Producto para Detalle y Contexto Histórico (CU-05)
+  // 5. Detalle de Producto & Contexto Histórico (CU-05)
   const handleSelectProduct = async (id) => {
     try {
       setSelectedProductId(id);
       const res = await api.get(`/products/${id}`);
       setSelectedProductData(res.data.data);
     } catch (err) {
-      showToast('No se pudo cargar el contexto histórico del producto.', 'error');
+      showToast('No se pudo cargar el dossier histórico de la pieza.', 'error');
     }
   };
 
-  // 6. Manejo de Carrito (CU-07)
+  // 6. Carrito de Compras (CU-07)
   const handleAddToCart = async (productoId, cantidad = 1) => {
     if (!user) {
       setAuthModalOpen(true);
-      showToast('Por favor ingresa o crea una cuenta para añadir artículos a la bóveda.', 'info');
+      showToast('Inicia sesión para resguardar piezas en tu bóveda personal.', 'info');
       return;
     }
 
     try {
       const res = await api.post('/cart', { producto_id: productoId, cantidad });
       setCart(res.data.data);
-      showToast('Artículo asegurado en tu carrito.', 'success');
+      showToast('Pieza resguardada en tu bóveda con éxito.', 'success');
       if (selectedProductData) {
         setSelectedProductData(null);
       }
     } catch (err) {
-      showToast(err.response?.data?.message || 'Error al validar existencias en tiempo real.', 'error');
+      showToast(err.response?.data?.message || 'Error al verificar existencias en tiempo real.', 'error');
     }
   };
 
@@ -202,7 +202,7 @@ export default function App() {
     try {
       const res = await api.delete(`/cart/${itemId}`);
       setCart(res.data.data);
-      showToast('Artículo retirado del carrito.', 'info');
+      showToast('Pieza retirada de la bóveda.', 'info');
     } catch (err) {
       showToast('Error al eliminar artículo.', 'error');
     }
@@ -212,9 +212,9 @@ export default function App() {
     try {
       const res = await api.delete('/cart');
       setCart(res.data.data);
-      showToast('Carrito vaciado exitosamente.', 'info');
+      showToast('Bóveda vaciada.', 'info');
     } catch (err) {
-      showToast('Error al vaciar carrito.', 'error');
+      showToast('Error al vaciar bóveda.', 'error');
     }
   };
 
@@ -225,9 +225,9 @@ export default function App() {
       setActivePreferences(res.data.data.preferences_applied);
       setProducts(res.data.data.recommendations);
       setQuestionnaireOpen(false);
-      showToast('¡Preferencias guardadas! Feed ordenado por puntaje de afinidad (+3, +2, +1).', 'success');
+      showToast('¡Calibración exitosa! Archivo ordenado por afinidad (+3, +2, +1 pts).', 'success');
     } catch (err) {
-      showToast('Error al procesar el cuestionario.', 'error');
+      showToast('Error al procesar parámetros del concierge.', 'error');
     }
   };
 
@@ -238,7 +238,7 @@ export default function App() {
       const res = await api.post('/checkout', checkoutData);
       fetchCart();
       fetchCatalogOrRecommendations();
-      showToast('¡Compra confirmada! Stock actualizado en SQL Server.', 'success');
+      showToast('¡Adquisición asentada en base de datos con éxito!', 'success');
       return res.data.data;
     } finally {
       setCheckoutLoading(false);
@@ -252,7 +252,7 @@ export default function App() {
       const res = await api.post('/auth/login', credentials);
       localStorage.setItem('mythic_token', res.data.data.token);
       setUser(res.data.data.usuario);
-      showToast(`¡Bienvenido de vuelta, ${res.data.data.usuario.nombre_completo}!`, 'success');
+      showToast(`¡Bienvenido al santuario, ${res.data.data.usuario.nombre_completo}!`, 'success');
     } finally {
       setAuthLoading(false);
     }
@@ -264,7 +264,7 @@ export default function App() {
       const res = await api.post('/auth/register', userData);
       localStorage.setItem('mythic_token', res.data.data.token);
       setUser(res.data.data.usuario);
-      showToast('Cuenta creada con éxito. Correo de bienvenida en camino.', 'success');
+      showToast('Cuenta de custodia creada exitosamente.', 'success');
     } finally {
       setAuthLoading(false);
     }
@@ -275,29 +275,35 @@ export default function App() {
     setUser(null);
     setCart({ items: [], total: 0, count: 0 });
     setActivePreferences(null);
-    showToast('Sesión cerrada correctamente.', 'info');
+    showToast('Sesión cerrada con seguridad.', 'info');
+  };
+
+  const scrollToCatalog = () => {
+    const el = document.getElementById('catalog-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-      <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-between selection:bg-primary-container selection:text-white">
+    <div className="min-h-screen bg-noir-950 text-neutral-100 flex flex-col justify-between selection:bg-gold-500 selection:text-noir-950">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+        <div className="fixed bottom-8 right-8 z-50 animate-bounce">
           <div
-            className={`px-4 py-3 rounded-xl border shadow-2xl text-xs font-semibold flex items-center space-x-2 ${
+            className={`px-5 py-3.5 rounded-2xl border shadow-2xl text-xs font-mono tracking-wide flex items-center space-x-2.5 backdrop-blur-xl ${
               toastMessage.type === 'error'
-                ? 'bg-danger-container/90 border-danger text-danger'
+                ? 'bg-crimson-600/90 border-crimson-500 text-white'
                 : toastMessage.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
-                : 'bg-surface-high/90 border-primary-container/50 text-primary'
+                ? 'bg-noir-900/95 border-gold-400 text-gold-300 shadow-gold-glow'
+                : 'bg-noir-900/95 border-white/20 text-white'
             }`}
           >
+            <Sparkles className="w-3.5 h-3.5 text-gold-400" />
             <span>{toastMessage.msg}</span>
           </div>
         </div>
       )}
 
-      {/* Barra de Navegación Principal */}
+      {/* Main Navigation with Mega Menu */}
       <Navbar
         cartCount={cart.count}
         onOpenCart={() => setCartOpen(true)}
@@ -305,50 +311,41 @@ export default function App() {
         onOpenAuth={() => setAuthModalOpen(true)}
         user={user}
         onLogout={handleLogout}
+        onSelectFranchiseFilter={(f) => {
+          setFilters((prev) => ({ ...prev, franquicia: f }));
+          scrollToCatalog();
+        }}
+        onSelectCategoryFilter={(c) => {
+          setFilters((prev) => ({ ...prev, categoria: c }));
+          scrollToCatalog();
+        }}
+        franchises={filterMeta.franquicias}
+        categories={filterMeta.categorias}
       />
 
-      {/* Contenido Principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        {/* Hero Section Coleccionable */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-surface-low via-primary-container/20 to-surface-low border border-white/10 p-8 sm:p-12 mb-10 shadow-2xl flex items-center justify-between gap-8">
-          <div className="max-w-3xl space-y-4">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary-container/15 border border-primary-container/40 text-primary text-xs font-bold uppercase tracking-widest">
-              <span>Garantía de Autenticidad Curada & Trazabilidad Histórica</span>
-            </div>
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+        {/* Full-Width Editorial Hero Section */}
+        <HeroEditorial
+          onOpenQuestionnaire={() => setQuestionnaireOpen(true)}
+          onExploreCatalog={scrollToCatalog}
+          featuredCount={products.length || 42}
+        />
 
-            <h1 className="text-3xl sm:text-5xl font-black font-mythic tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-primary to-secondary leading-tight">
-              Piezas Legendarias que Trascendieron el Tiempo
-            </h1>
+        {/* Horizontal Featured Collectibles Carousel */}
+        <FeaturedCarousel
+          products={products}
+          onSelectProduct={handleSelectProduct}
+          onAddToCart={(id) => handleAddToCart(id, 1)}
+        />
 
-            <p className="text-sm sm:text-base text-on-surface-variant leading-relaxed max-w-2xl">
-              Mythic Shelf es el santuario de comercio electrónico para coleccionistas exigentes. Cada figura vintage, carta codiciada y cartucho sellado cuenta con procedencia verificada, contexto de época y resguardo asegurado.
-            </p>
-
-            <div className="pt-2 flex flex-wrap gap-4">
-              <button
-                onClick={() => setQuestionnaireOpen(true)}
-                className="px-6 py-3 rounded-xl bg-primary-container hover:bg-primary-dark text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40 flex items-center space-x-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Configurar Preferencias de Búsqueda</span>
-              </button>
-            </div>
-          </div>
-
-          <img
-            src="/logo-mythic-shelf.webp"
-            alt="Mythic Shelf"
-            className="hidden md:block w-56 lg:w-72 shrink-0 drop-shadow-[0_0_25px_rgba(220,38,38,0.35)]"
-          />
-        </div>
-
-        {/* Banner de Recomendaciones con Puntaje */}
+        {/* Predictive Recommendation Scoring Banner */}
         <RecommendationBanner
           preferences={activePreferences}
           onRetakeQuiz={() => setQuestionnaireOpen(true)}
         />
 
-        {/* Catálogo con Filtros en Vivo */}
+        {/* Master Catalog with Real-Time Filters */}
         <Catalog
           products={products}
           filters={filters}
@@ -360,20 +357,21 @@ export default function App() {
         />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-surface-lowest py-8 text-center text-xs text-outline mt-16">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
-            <span className="font-arcade text-on-surface-variant text-sm">MYTHIC SHELF</span>
-            <span>• Arquitectura Full-Stack B2C</span>
+      {/* Luxury Footer */}
+      <footer className="border-t border-white/[0.08] bg-noir-900/60 py-12 text-xs text-platinum-500 mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center space-x-3">
+            <span className="font-serif text-white font-bold tracking-[0.2em] text-sm">MYTHIC SHELF</span>
+            <span className="text-white/20">•</span>
+            <span className="font-mono text-[11px] text-platinum-400">High-End Collectibles & Archival Vault</span>
           </div>
-          <div className="text-on-surface-variant">
-            Powered by Node.js, Express, Microsoft SQL Server, React & Tailwind CSS
+          <div className="text-[11px] font-mono text-platinum-400 tracking-wider">
+            Curated Architecture: Node.js • Microsoft SQL Server • React • Tailwind CSS
           </div>
         </div>
       </footer>
 
-      {/* Modales y Drawers */}
+      {/* Modals & Drawers */}
       <ProductModal
         product={selectedProductData}
         onClose={() => setSelectedProductData(null)}

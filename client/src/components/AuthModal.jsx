@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Shield, AlertCircle } from 'lucide-react';
+import { X, Lock, Mail, User, Shield, AlertCircle, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loading }) {
   if (!isOpen) return null;
@@ -52,42 +53,48 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-lowest/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-surface-container border border-white/10 rounded-2xl shadow-2xl shadow-primary-container/20 p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-noir-950/85 backdrop-blur-md animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.25 }}
+        className="relative w-full max-w-md bg-noir-900 border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-10"
+      >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-white"
+          className="absolute top-5 right-5 p-2 rounded-full bg-noir-950/80 text-platinum-400 hover:text-white transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Selector Login / Registro */}
-        <div className="flex border-b border-white/10 mb-6">
+        {/* Tab Selector */}
+        <div className="flex border-b border-white/[0.08] mb-6">
           <button
             onClick={() => setMode('login')}
-            className={`flex-1 pb-3 text-sm font-bold transition-colors ${
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all ${
               mode === 'login'
-                ? 'border-b-2 border-primary-container text-primary'
-                : 'text-outline hover:text-on-surface-variant'
+                ? 'border-b-2 border-gold-400 text-gold-300'
+                : 'text-platinum-500 hover:text-white'
             }`}
           >
             Iniciar Sesión
           </button>
           <button
             onClick={() => setMode('register')}
-            className={`flex-1 pb-3 text-sm font-bold transition-colors ${
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all ${
               mode === 'register'
-                ? 'border-b-2 border-primary-container text-primary'
-                : 'text-outline hover:text-on-surface-variant'
+                ? 'border-b-2 border-gold-400 text-gold-300'
+                : 'text-platinum-500 hover:text-white'
             }`}
           >
-            Crear Cuenta
+            Registro VIP
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-lg bg-danger-container/30 border border-danger/40 text-danger text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="mb-4 p-3.5 rounded-xl bg-crimson-600/10 border border-crimson-600/30 text-rose-300 text-xs flex items-center space-x-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-crimson-500" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -95,69 +102,69 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5">
                 Nombre Completo
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-platinum-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   required
-                  placeholder="ej. Indiana Jones"
+                  placeholder="ej. Howard Hughes"
                   value={formData.nombre_completo}
                   onChange={(e) => setFormData({ ...formData, nombre_completo: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-gold-500 font-sans shadow-inner"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-on-surface-variant mb-1">
-              Correo Electrónico
+            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5">
+              Credencial / Correo Electrónico
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-platinum-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 required
                 placeholder="collector@mythicshelf.com"
                 value={formData.correo_electronico}
                 onChange={(e) => setFormData({ ...formData, correo_electronico: e.target.value })}
-                className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
+                className="w-full pl-10 pr-3.5 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-gold-500 font-sans shadow-inner"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-on-surface-variant mb-1">
+            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5">
               Contraseña
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-platinum-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 required
                 placeholder="••••••••"
                 value={formData.contrasena}
                 onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
-                className="w-full pl-9 pr-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface placeholder-outline focus:outline-none focus:border-tertiary"
+                className="w-full pl-10 pr-3.5 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-gold-500 font-sans shadow-inner"
               />
             </div>
           </div>
 
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1">
-                Rol en la Plataforma
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-platinum-300 mb-1.5">
+                Rango en la Plataforma
               </label>
               <select
                 value={formData.rol}
                 onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
-                className="w-full px-3 py-2 bg-surface-lowest border border-white/10 rounded-lg text-xs text-on-surface focus:outline-none focus:border-tertiary"
+                className="w-full px-3.5 py-2.5 bg-noir-950 border border-white/10 rounded-xl text-xs text-platinum-200 focus:outline-none focus:border-gold-500 font-sans cursor-pointer"
               >
-                <option value="Comprador">Comprador (Coleccionista)</option>
-                <option value="Vendedor">Vendedor (Curador / Tienda)</option>
+                <option value="Comprador">Comprador (Coleccionista Privado)</option>
+                <option value="Vendedor">Vendedor (Curador de Bóveda)</option>
               </select>
             </div>
           )}
@@ -166,38 +173,38 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, loadin
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-primary-container hover:bg-primary-dark text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary-container/40 disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 hover:from-gold-400 hover:to-gold-300 text-noir-950 font-black text-xs uppercase tracking-widest transition-all shadow-gold-glow disabled:opacity-50"
             >
               {loading
-                ? 'Conectando...'
+                ? 'Validando Credencial...'
                 : mode === 'login'
-                ? 'Ingresar al Santuario'
-                : 'Registrar Cuenta Segura'}
+                ? 'Ingresar al Santuario VIP'
+                : 'Registrar Cuenta de Custodia'}
             </button>
           </div>
         </form>
 
         {/* Demo Fast-login Buttons */}
-        <div className="mt-6 pt-4 border-t border-white/10 text-center">
-          <span className="text-[10px] text-outline uppercase block font-semibold mb-2">
-            Acceso Rápido a Cuentas Semilla:
+        <div className="mt-6 pt-4 border-t border-white/[0.08] text-center">
+          <span className="text-[10px] font-mono tracking-widest text-platinum-500 uppercase block mb-2">
+            Acceso Inmediato de Prueba:
           </span>
           <div className="flex justify-center gap-2">
             <button
               onClick={() => handleFillDemo('buyer')}
-              className="px-2.5 py-1 text-[11px] bg-primary-container/10 hover:bg-primary-container/20 text-primary rounded border border-primary-container/40"
+              className="px-3 py-1.5 text-xs bg-noir-950 hover:bg-noir-850 text-gold-300 rounded-lg border border-gold-500/30 font-mono"
             >
               Comprador Demo
             </button>
             <button
               onClick={() => handleFillDemo('seller')}
-              className="px-2.5 py-1 text-[11px] bg-tertiary/10 hover:bg-tertiary/20 text-tertiary rounded border border-tertiary/40"
+              className="px-3 py-1.5 text-xs bg-noir-950 hover:bg-noir-850 text-platinum-300 rounded-lg border border-white/10 font-mono"
             >
               Vendedor Demo
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
