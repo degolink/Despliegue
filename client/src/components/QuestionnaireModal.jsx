@@ -36,6 +36,26 @@ const getQuestionGif = (dimension, step) => {
   return DIMENSION_GIFS[dimension] || '/gifs/sprite-01.gif';
 };
 
+// Calibración de zoom y encuadre enfocado al centro según la relación de aspecto del GIF
+const getGifStyle = (gifUrl = '') => {
+  if (
+    gifUrl.includes('f53e3108') ||
+    gifUrl.includes('7074a1cf') ||
+    gifUrl.includes('pixel-arcade') ||
+    gifUrl.includes('pixel-hero')
+  ) {
+    // Zoom enfocado directamente al centro de la imagen para encuadrar la acción (128x572)
+    return 'object-cover object-center scale-[3.4] transform origin-center';
+  }
+  if (gifUrl.includes('Sprite-0001') || gifUrl.includes('sprite-01')) {
+    return 'object-cover object-center scale-[1.8] transform origin-center';
+  }
+  if (gifUrl.includes('Sprite-0002') || gifUrl.includes('sprite-02')) {
+    return 'object-cover object-center scale-[1.5] transform origin-center';
+  }
+  return 'object-contain object-center';
+};
+
 export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentPreferences }) {
   if (!isOpen) return null;
 
@@ -316,17 +336,22 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
                   )}
                 </div>
 
-                {/* Animated Pop-Culture Character GIF Badge */}
-                <div className="shrink-0 p-1 rounded-2xl bg-noir-950/90 border border-gold-500/30 shadow-luxury overflow-hidden">
-                  <img
-                    src={getQuestionGif(currentQ.dimension, currentStep)}
-                    alt="Animación de Cultura Pop"
-                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-xl"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
+                {/* Animated Pop-Culture Character GIF Badge con zoom enfocado al centro */}
+                {(() => {
+                  const gifUrl = getQuestionGif(currentQ.dimension, currentStep);
+                  return (
+                    <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 p-1 rounded-2xl bg-noir-950/90 border border-gold-500/40 shadow-luxury overflow-hidden relative flex items-center justify-center">
+                      <img
+                        src={gifUrl}
+                        alt="Animación de Cultura Pop"
+                        className={`w-full h-full rounded-xl transition-transform duration-500 ${getGifStyle(gifUrl)}`}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Options Grid */}
