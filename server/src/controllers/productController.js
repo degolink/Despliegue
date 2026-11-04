@@ -214,9 +214,125 @@ const getFilterMetadata = async (req, res, next) => {
   }
 };
 
+/**
+ * CU-09: Alta de producto por un Vendedor (o Administrador)
+ * POST /api/products
+ *
+ * Inserta PRODUCTOS y CONTEXTO_HISTORICO en una sola transacción: o se crean ambos o ninguno.
+ * El vendedor_id se toma SIEMPRE del token verificado, nunca del cuerpo de la petición.
+ */
+const createProduct = async (req, res, next) => {
+  const vendedorId = req.user.usuario_id;
+  const {
+    nombre,
+    franquicia,
+    categoria,
+    decada,
+    precio,
+    estado_conservacion,
+    stock,
+    imagen_url,
+    ano_fabricacion,
+    tirada_produccion,
+    procedencia,
+    variantes_diseno,
+    relevancia_cultural,
+    nivel_autenticidad,
+  } = req.body;
+
+  let transaction;
+  try {
+    const pool = await getPool();
+
+    // Evitar duplicados del mismo vendedor (misma clave que usa el seed del catálogo)
+    const duplicate = await pool
+      .request()
+      .input('nombre', sql.NVarChar(150), nombre)
+      .input('vendedor_id', sql.Int, vendedorId)
+      .query('SELECT producto_id FROM dbo.PRODUCTOS WHERE nombre = @nombre AND vendedor_id = @vendedor_id');
+
+    if (duplicate.recordset.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: `Ya tienes publicada una pieza con el nombre "${nombre}".`,
+      });
+    }
+
+    transaction = new sql.Transaction(pool);
+    await transaction.begin();
+
+    const productResult = await new sql.Request(transaction)
+      .input('vendedor_id', sql.Int, vendedorId)
+      .input('nombre', sql.NVarChar(150), nombre)
+      .input('franquicia', sql.NVarChar(100), franquicia)
+      .input('categoria', sql.NVarChar(50), categoria)
+      .input('decada', sql.VarChar(20), decada)
+      .input('precio', sql.Decimal(10, 2), precio)
+      .input('estado_conservacion', sql.NVarChar(30), estado_conservacion)
+      .input('stock', sql.Int, stock)
+      .input('imagen_url', sql.VarChar(255), imagen_url || null)
+      .query(`
+        INSERT INTO dbo.PRODUCTOS
+          (vendedor_id, nombre, franquicia, categoria, decada, precio, estado_conservacion, stock, imagen_url)
+        OUTPUT INSERTED.producto_id, INSERTED.fecha_publicacion
+        VALUES
+          (@vendedor_id, @nombre, @franquicia, @categoria, @decada, @precio, @estado_conservacion, @stock, @imagen_url);
+      `);
+
+    const { producto_id, fecha_publicacion } = productResult.recordset[0];
+
+    await new sql.Request(transaction)
+      .input('producto_id', sql.Int, producto_id)
+      .input('ano_fabricacion', sql.Int, ano_fabricacion)
+      .input('tirada_produccion', sql.NVarChar(100), tirada_produccion || null)
+      .input('procedencia', sql.NVarChar(150), procedencia || null)
+      .input('variantes_diseno', sql.NVarChar(sql.MAX), variantes_diseno || null)
+      .input('relevancia_cultural', sql.NVarChar(sql.MAX), relevancia_cultural || null)
+      .input('nivel_autenticidad', sql.NVarChar(50), nivel_autenticidad || null)
+      .query(`
+        INSERT INTO dbo.CONTEXTO_HISTORICO
+          (producto_id, ano_fabricacion, tirada_produccion, procedencia, variantes_diseno, relevancia_cultural, nivel_autenticidad)
+        VALUES
+          (@producto_id, @ano_fabricacion, @tirada_produccion, @procedencia, @variantes_diseno, @relevancia_cultural, @nivel_autenticidad);
+      `);
+
+    await transaction.commit();
+
+    res.status(201).json({
+      success: true,
+      message: 'Pieza publicada en el catálogo con éxito.',
+      data: {
+        producto_id,
+        fecha_publicacion,
+        vendedor_id: vendedorId,
+        nombre,
+        franquicia,
+        categoria,
+        decada,
+        precio,
+        estado_conservacion,
+        stock,
+        imagen_url: imagen_url || null,
+        ano_fabricacion,
+        tirada_produccion: tirada_produccion || null,
+        procedencia: procedencia || null,
+        variantes_diseno: variantes_diseno || null,
+        relevancia_cultural: relevancia_cultural || null,
+        nivel_autenticidad: nivel_autenticidad || null,
+      },
+    });
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback().catch(() => {});
+    }
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
   getFilterMetadata,
+  createProduct,
 };
 

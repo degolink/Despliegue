@@ -19,6 +19,7 @@ import {
   BarChart3,
   Award,
   RefreshCw,
+  PlusCircle,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -37,10 +38,11 @@ import {
   Legend,
 } from 'recharts';
 import api from '../services/api';
+import AddProductForm from './AddProductForm';
 
 const GOLD_PALETTE = ['#D4AF37', '#F3E5AB', '#AA771C', '#94A3B8', '#64748B', '#E5C158'];
 
-export default function SellerDashboard({ isOpen, onClose, user }) {
+export default function SellerDashboard({ isOpen, onClose, user, filterMeta, onProductCreated }) {
   if (!isOpen) return null;
 
   const [activeTab, setActiveTab] = useState('resumen');
@@ -184,6 +186,7 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
             { id: 'productos', label: 'Rendimiento de Productos', icon: Package },
             { id: 'compradores', label: 'Conoce a tus compradores', icon: Users },
             { id: 'oportunidades', label: 'Oportunidades de venta', icon: Lightbulb },
+            { id: 'publicar', label: 'Publicar pieza', icon: PlusCircle },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -206,7 +209,16 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto pt-6 pr-1 space-y-6">
-          {loading ? (
+          {/* TAB: PUBLICAR PIEZA (independiente de la carga de analítica) */}
+          {activeTab === 'publicar' ? (
+            <AddProductForm
+              metadata={filterMeta}
+              onCreated={(product) => {
+                fetchDashboardData();
+                if (onProductCreated) onProductCreated(product);
+              }}
+            />
+          ) : loading ? (
             <div className="py-24 text-center">
               <RefreshCw className="w-8 h-8 text-gold-400 animate-spin mx-auto mb-3" />
               <p className="text-xs font-mono text-platinum-400 uppercase tracking-widest">

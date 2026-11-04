@@ -109,7 +109,7 @@ export default function App() {
   }, []);
 
   // 2. Cargar Metadatos de Filtro
-  useEffect(() => {
+  const fetchFilterMeta = () => {
     api
       .get('/products/meta/filters')
       .then((res) => {
@@ -118,6 +118,10 @@ export default function App() {
         }
       })
       .catch(() => console.warn('Usando metadatos de filtro predeterminados.'));
+  };
+
+  useEffect(() => {
+    fetchFilterMeta();
   }, []);
 
   // 3. Cargar Carrito de Compras si está autenticado
@@ -339,6 +343,13 @@ export default function App() {
     showToast('Sesión cerrada con seguridad.', 'info');
   };
 
+  // 11. Alta de producto por Vendedor (CU-09): refrescar catálogo y filtros
+  const handleProductCreated = (product) => {
+    fetchFilterMeta();
+    fetchCatalogOrRecommendations();
+    showToast(`«${product.nombre}» publicada en el catálogo.`, 'success');
+  };
+
   // 10. Recuperación de contraseña (RF-03)
   const handleForgotPassword = async (correo_electronico) => {
     const res = await api.post('/auth/forgot-password', { correo_electronico });
@@ -508,6 +519,8 @@ export default function App() {
         isOpen={sellerDashboardOpen}
         onClose={() => setSellerDashboardOpen(false)}
         user={user}
+        filterMeta={filterMeta}
+        onProductCreated={handleProductCreated}
       />
     </div>
   );
