@@ -15,3 +15,4 @@ router.get('/customers', (req, res, next) => sellerAnalyticsController.getCustom
 router.get('/opportunities', (req, res, next) => sellerAnalyticsController.getCommercialOpportunities(req, res, next));
 
 module.exports = router;
+

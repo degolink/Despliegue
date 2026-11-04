@@ -18,6 +18,24 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUIZ_QUESTIONS, DIMENSION_WEIGHTS } from '../data/personalityQuiz';
 
+// Mapeo dinámico de GIFs animados por dimensión y arquetipo
+const DIMENSION_GIFS = {
+  universos: '/gifs/pixel-hero.gif',
+  categorias: '/gifs/gemini-relic.gif',
+  personajes: '/gifs/sprite-02.gif',
+  eventos: '/gifs/pixel-arcade.gif',
+  nostalgia: '/gifs/80s-vintage.gif',
+  rareza: '/gifs/sprite-01.gif',
+  motivacion: '/gifs/sprite-03.gif',
+};
+
+const getQuestionGif = (dimension, step) => {
+  if (dimension === 'nostalgia') {
+    return step % 2 === 0 ? '/gifs/80s-vintage.gif' : '/gifs/90s-nostalgia.gif';
+  }
+  return DIMENSION_GIFS[dimension] || '/gifs/sprite-01.gif';
+};
+
 export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentPreferences }) {
   if (!isOpen) return null;
 
@@ -283,17 +301,33 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
 
             {/* Question Card */}
             <div className="min-h-[220px]">
-              <span className="inline-block px-2.5 py-0.5 rounded-md bg-gold-500/10 border border-gold-500/20 text-[10px] font-mono text-gold-300 uppercase tracking-widest mb-2">
-                Dimensión: {currentQ.dimension.toUpperCase()}
-              </span>
-              <h2 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-wide leading-snug">
-                {currentQ.pregunta}
-              </h2>
-              {currentQ.subtitulo && (
-                <p className="text-xs text-platinum-400 mt-1 font-light leading-relaxed">
-                  {currentQ.subtitulo}
-                </p>
-              )}
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <div className="flex-1">
+                  <span className="inline-block px-2.5 py-0.5 rounded-md bg-gold-500/10 border border-gold-500/20 text-[10px] font-mono text-gold-300 uppercase tracking-widest mb-2">
+                    Dimensión: {currentQ.dimension.toUpperCase()}
+                  </span>
+                  <h2 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-wide leading-snug">
+                    {currentQ.pregunta}
+                  </h2>
+                  {currentQ.subtitulo && (
+                    <p className="text-xs text-platinum-400 mt-1 font-light leading-relaxed">
+                      {currentQ.subtitulo}
+                    </p>
+                  )}
+                </div>
+
+                {/* Animated Pop-Culture Character GIF Badge */}
+                <div className="shrink-0 p-1 rounded-2xl bg-noir-950/90 border border-gold-500/30 shadow-luxury overflow-hidden">
+                  <img
+                    src={getQuestionGif(currentQ.dimension, currentStep)}
+                    alt="Animación de Cultura Pop"
+                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-xl"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              </div>
 
               {/* Options Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
@@ -357,8 +391,15 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
         ) : (
           /* PANTALLA FINAL: RESUMEN DE PERFIL Y ENVÍO */
           <div className="text-center py-4">
-            <div className="w-16 h-16 rounded-full bg-gold-500/20 border border-gold-400/40 flex items-center justify-center mx-auto mb-4 shadow-luxury">
-              <Sparkles className="w-8 h-8 text-gold-400" />
+            <div className="w-20 h-20 rounded-3xl bg-noir-950/90 border border-gold-400/40 p-1.5 flex items-center justify-center mx-auto mb-4 shadow-luxury overflow-hidden relative">
+              <img
+                src="/gifs/gemini-relic.gif"
+                alt="Reliquia Arquetípica"
+                className="w-full h-full object-contain rounded-2xl"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             </div>
 
             <span className="text-[10px] font-mono uppercase tracking-widest text-gold-400 font-bold">

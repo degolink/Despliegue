@@ -150,3 +150,4 @@ class SellerAnalyticsController {
 }
 
 module.exports = new SellerAnalyticsController();
+

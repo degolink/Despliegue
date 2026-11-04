@@ -175,3 +175,4 @@ Para respetar la arquitectura existente y las convenciones del repositorio:
 ## 8. Conclusión de la Auditoría
 
 El modelo relacional existente en Microsoft SQL Server (`MythicShelfDB`) es **100% suficiente y robusto** para satisfacer la totalidad de requerimientos del panel de ventas, segmentación y perfilado de clientes. **No se requiere ninguna modificación de tablas, columnas, índices ni constraints en la base de datos.**
+

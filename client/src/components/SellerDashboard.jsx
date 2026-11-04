@@ -756,3 +756,4 @@ export default function SellerDashboard({ isOpen, onClose, user }) {
     </div>
   );
 }
+
