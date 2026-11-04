@@ -18,44 +18,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUIZ_QUESTIONS, DIMENSION_WEIGHTS } from '../data/personalityQuiz';
 
-// Mapeo dinámico de GIFs animados por dimensión y arquetipo
-const DIMENSION_GIFS = {
-  universos: '/gifs/pixel-hero.gif',
-  categorias: '/gifs/gemini-relic.gif',
-  personajes: '/gifs/sprite-02.gif',
-  eventos: '/gifs/pixel-arcade.gif',
-  nostalgia: '/gifs/80s-vintage.gif',
-  rareza: '/gifs/sprite-01.gif',
-  motivacion: '/gifs/sprite-03.gif',
-};
-
-const getQuestionGif = (dimension, step) => {
-  if (dimension === 'nostalgia') {
-    return step % 2 === 0 ? '/gifs/80s-vintage.gif' : '/gifs/90s-nostalgia.gif';
-  }
-  return DIMENSION_GIFS[dimension] || '/gifs/sprite-01.gif';
-};
-
-// Calibración de zoom y encuadre enfocado al centro según la relación de aspecto del GIF
-const getGifStyle = (gifUrl = '') => {
-  if (
-    gifUrl.includes('f53e3108') ||
-    gifUrl.includes('7074a1cf') ||
-    gifUrl.includes('pixel-arcade') ||
-    gifUrl.includes('pixel-hero')
-  ) {
-    // Zoom enfocado directamente al centro de la imagen para encuadrar la acción (128x572)
-    return 'object-cover object-center scale-[3.4] transform origin-center';
-  }
-  if (gifUrl.includes('Sprite-0001') || gifUrl.includes('sprite-01')) {
-    return 'object-cover object-center scale-[1.8] transform origin-center';
-  }
-  if (gifUrl.includes('Sprite-0002') || gifUrl.includes('sprite-02')) {
-    return 'object-cover object-center scale-[1.5] transform origin-center';
-  }
-  return 'object-contain object-center';
-};
-
 export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentPreferences }) {
   if (!isOpen) return null;
 
@@ -321,38 +283,17 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
 
             {/* Question Card */}
             <div className="min-h-[220px]">
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div className="flex-1">
-                  <span className="inline-block px-2.5 py-0.5 rounded-md bg-gold-500/10 border border-gold-500/20 text-[10px] font-mono text-gold-300 uppercase tracking-widest mb-2">
-                    Dimensión: {currentQ.dimension.toUpperCase()}
-                  </span>
-                  <h2 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-wide leading-snug">
-                    {currentQ.pregunta}
-                  </h2>
-                  {currentQ.subtitulo && (
-                    <p className="text-xs text-platinum-400 mt-1 font-light leading-relaxed">
-                      {currentQ.subtitulo}
-                    </p>
-                  )}
-                </div>
-
-                {/* Animated Pop-Culture Character GIF Badge con zoom enfocado al centro */}
-                {(() => {
-                  const gifUrl = getQuestionGif(currentQ.dimension, currentStep);
-                  return (
-                    <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 p-1 rounded-2xl bg-noir-950/90 border border-gold-500/40 shadow-luxury overflow-hidden relative flex items-center justify-center">
-                      <img
-                        src={gifUrl}
-                        alt="Animación de Cultura Pop"
-                        className={`w-full h-full rounded-xl transition-transform duration-500 ${getGifStyle(gifUrl)}`}
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  );
-                })()}
-              </div>
+              <span className="inline-block px-2.5 py-0.5 rounded-md bg-gold-500/10 border border-gold-500/20 text-[10px] font-mono text-gold-300 uppercase tracking-widest mb-2">
+                Dimensión: {currentQ.dimension.toUpperCase()}
+              </span>
+              <h2 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-wide leading-snug">
+                {currentQ.pregunta}
+              </h2>
+              {currentQ.subtitulo && (
+                <p className="text-xs text-platinum-400 mt-1 font-light leading-relaxed">
+                  {currentQ.subtitulo}
+                </p>
+              )}
 
               {/* Options Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
@@ -416,15 +357,8 @@ export default function QuestionnaireModal({ isOpen, onClose, onSubmit, currentP
         ) : (
           /* PANTALLA FINAL: RESUMEN DE PERFIL Y ENVÍO */
           <div className="text-center py-4">
-            <div className="w-20 h-20 rounded-3xl bg-noir-950/90 border border-gold-400/40 p-1.5 flex items-center justify-center mx-auto mb-4 shadow-luxury overflow-hidden relative">
-              <img
-                src="/gifs/gemini-relic.gif"
-                alt="Reliquia Arquetípica"
-                className="w-full h-full object-contain rounded-2xl"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+            <div className="w-16 h-16 rounded-full bg-gold-500/20 border border-gold-400/40 flex items-center justify-center mx-auto mb-4 shadow-luxury">
+              <Sparkles className="w-8 h-8 text-gold-400" />
             </div>
 
             <span className="text-[10px] font-mono uppercase tracking-widest text-gold-400 font-bold">
