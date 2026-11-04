@@ -329,10 +329,65 @@ const createProduct = async (req, res, next) => {
   }
 };
 
+/**
+ * CU-10: Inventario propio del vendedor ("Mis piezas")
+ * GET /api/products/mine
+ *
+ * Devuelve SOLO las piezas del vendedor autenticado (vendedor_id del token), incluidas
+ * las agotadas, con su contexto histórico y las unidades vendidas en órdenes no canceladas.
+ */
+const getMyProducts = async (req, res, next) => {
+  try {
+    const vendedorId = req.user.usuario_id;
+    const pool = await getPool();
+
+    const result = await pool
+      .request()
+      .input('vendedor_id', sql.Int, vendedorId)
+      .query(`
+        SELECT
+          p.producto_id,
+          p.nombre,
+          p.franquicia,
+          p.categoria,
+          p.decada,
+          p.precio,
+          p.estado_conservacion,
+          p.stock,
+          p.imagen_url,
+          p.fecha_publicacion,
+          ch.ano_fabricacion,
+          ch.tirada_produccion,
+          ch.procedencia,
+          ch.nivel_autenticidad,
+          ISNULL(v.unidades_vendidas, 0) AS unidades_vendidas
+        FROM dbo.PRODUCTOS p
+        LEFT JOIN dbo.CONTEXTO_HISTORICO ch ON p.producto_id = ch.producto_id
+        LEFT JOIN (
+          SELECT d.producto_id, SUM(d.cantidad) AS unidades_vendidas
+          FROM dbo.DETALLE_ORDEN d
+          INNER JOIN dbo.ORDENES o ON d.orden_id = o.orden_id
+          WHERE o.estado_orden != 'Cancelada'
+          GROUP BY d.producto_id
+        ) v ON p.producto_id = v.producto_id
+        WHERE p.vendedor_id = @vendedor_id
+        ORDER BY p.fecha_publicacion DESC, p.producto_id DESC;
+      `);
+
+    res.status(200).json({
+      success: true,
+      data: result.recordset,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
   getFilterMetadata,
   createProduct,
+  getMyProducts,
 };
 

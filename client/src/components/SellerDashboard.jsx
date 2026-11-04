@@ -20,6 +20,7 @@ import {
   Award,
   RefreshCw,
   PlusCircle,
+  Boxes,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -39,13 +40,18 @@ import {
 } from 'recharts';
 import api from '../services/api';
 import AddProductForm from './AddProductForm';
+import MyProductsList from './MyProductsList';
 
 const GOLD_PALETTE = ['#D4AF37', '#F3E5AB', '#AA771C', '#94A3B8', '#64748B', '#E5C158'];
 
 export default function SellerDashboard({ isOpen, onClose, user, filterMeta, onProductCreated }) {
-  if (!isOpen) return null;
+  // Panel exclusivo de vendedores: el backend también exige el rol en cada endpoint.
+  const isSeller = !!user && (user.rol === 'Vendedor' || user.rol === 'Administrador');
+  if (!isOpen || !isSeller) return null;
 
   const [activeTab, setActiveTab] = useState('resumen');
+  // Última pieza publicada en esta sesión, para resaltarla en "Mis piezas"
+  const [lastCreatedId, setLastCreatedId] = useState(null);
   const [dateRange, setDateRange] = useState('all'); // '7d', '30d', '90d', 'all'
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -186,6 +192,7 @@ export default function SellerDashboard({ isOpen, onClose, user, filterMeta, onP
             { id: 'productos', label: 'Rendimiento de Productos', icon: Package },
             { id: 'compradores', label: 'Conoce a tus compradores', icon: Users },
             { id: 'oportunidades', label: 'Oportunidades de venta', icon: Lightbulb },
+            { id: 'mis-piezas', label: 'Mis piezas', icon: Boxes },
             { id: 'publicar', label: 'Publicar pieza', icon: PlusCircle },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -216,7 +223,16 @@ export default function SellerDashboard({ isOpen, onClose, user, filterMeta, onP
               onCreated={(product) => {
                 fetchDashboardData();
                 if (onProductCreated) onProductCreated(product);
+                // Llevar al vendedor a su inventario con la pieza nueva resaltada
+                setLastCreatedId(product.producto_id);
+                setActiveTab('mis-piezas');
               }}
+            />
+          ) : activeTab === 'mis-piezas' ? (
+            <MyProductsList
+              highlightId={lastCreatedId}
+              reloadKey={lastCreatedId}
+              onAddNew={() => setActiveTab('publicar')}
             />
           ) : loading ? (
             <div className="py-24 text-center">
