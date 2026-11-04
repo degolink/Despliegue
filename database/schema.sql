@@ -1,4 +1,4 @@
-﻿-- =====================================================================
+-- =====================================================================
 -- PROYECTO: MYTHIC SHELF - E-COMMERCE B2C DE COLECCIONABLES
 -- SCRIPT DDL: CREACIÓN DE BASE DE DATOS Y TABLAS EN SQL SERVER
 -- Motor: Microsoft SQL Server (2019 / 2022 / Azure SQL)
@@ -187,12 +187,11 @@ GO
 -- DATOS SEMILLA (SEEDS) PARA PRUEBAS INICIALES
 -- =====================================================================
 -- 1. Usuarios de prueba (contraseña por defecto encriptada: 'Mythic2024!')
--- Hash bcrypt representativo para '$2a$10$wT8hTqL1l18z...':
 INSERT INTO dbo.USUARIOS (nombre_completo, correo_electronico, hash_contrasena, rol, estado_cuenta)
 VALUES 
-('Lord Collector Admin', 'admin@mythicshelf.com', '$2b$10$ep5rF04w8.m25iOwhgZ6mO8mP2tZtJ84h65tX4a/6Y.1rYh23mG5O', 'Administrador', 1),
-('Obi-Wan Vintage Seller', 'seller@mythicshelf.com', '$2b$10$ep5rF04w8.m25iOwhgZ6mO8mP2tZtJ84h65tX4a/6Y.1rYh23mG5O', 'Vendedor', 1),
-('Luke Skywalker Collector', 'buyer@mythicshelf.com', '$2b$10$ep5rF04w8.m25iOwhgZ6mO8mP2tZtJ84h65tX4a/6Y.1rYh23mG5O', 'Comprador', 1);
+('Lord Collector Admin', 'admin@mythicshelf.com', '$2a$10$FBMivn32xkA7MjaWdD1iqeiU/nTgn9NQm0.B3QFTqB28ibpXh6E/m', 'Administrador', 1),
+('Obi-Wan Vintage Seller', 'seller@mythicshelf.com', '$2a$10$FBMivn32xkA7MjaWdD1iqeiU/nTgn9NQm0.B3QFTqB28ibpXh6E/m', 'Vendedor', 1),
+('Luke Skywalker Collector', 'buyer@mythicshelf.com', '$2a$10$FBMivn32xkA7MjaWdD1iqeiU/nTgn9NQm0.B3QFTqB28ibpXh6E/m', 'Comprador', 1);
 
 -- 2. Preferencias del comprador
 INSERT INTO dbo.PREFERENCIAS_USUARIO (usuario_id, franquicia_interes, categoria_preferida, decada_interes, presupuesto_min, presupuesto_max)
