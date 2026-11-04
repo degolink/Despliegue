@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Sparkles, User, LogOut, ChevronDown, ShieldCheck, Flame, Compass, Award } from 'lucide-react';
+import { ShoppingBag, Sparkles, User, LogOut, ChevronDown, ShieldCheck, Flame, Compass, Award, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar({
@@ -7,6 +7,7 @@ export default function Navbar({
   onOpenCart,
   onOpenQuestionnaire,
   onOpenAuth,
+  onOpenSellerDashboard,
   user,
   onLogout,
   onSelectFranchiseFilter,
@@ -155,6 +156,19 @@ export default function Navbar({
 
         {/* Action Controls */}
         <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Seller Analytics Dashboard Button (Only for Vendedor or Administrador) */}
+          {user && (user.rol === 'Vendedor' || user.rol === 'Administrador') && (
+            <button
+              onClick={onOpenSellerDashboard}
+              className="px-3.5 py-2 rounded-xl bg-gold-500/15 border border-gold-400/40 text-gold-300 hover:bg-gold-500 hover:text-noir-950 transition-all text-xs font-mono font-bold tracking-wider uppercase flex items-center space-x-1.5 shadow-luxury-sm"
+              title="Panel de Ventas e Inteligencia de Clientes"
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Panel de Ventas</span>
+              <span className="md:hidden">Ventas</span>
+            </button>
+          )}
+
           {/* Recommendation / Affinity Concierge CTA */}
           <button
             onClick={onOpenQuestionnaire}

@@ -12,6 +12,7 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const sellerAnalyticsRoutes = require('./routes/sellerAnalyticsRoutes');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/seller/analytics', sellerAnalyticsRoutes);
 
 // Manejo de rutas inexistentes (404)
 app.use((req, res, next) => {

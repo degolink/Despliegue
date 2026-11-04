@@ -9,6 +9,7 @@ import QuestionnaireModal from './components/QuestionnaireModal';
 import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AuthModal from './components/AuthModal';
+import SellerDashboard from './components/SellerDashboard';
 import api from './services/api';
 import { ShieldCheck, Lock, Sparkles, Award } from 'lucide-react';
 
@@ -50,6 +51,9 @@ export default function App() {
   // Estado de Checkout Transaccional (CHK / CU-08)
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  // Estado de Panel de Ventas de Vendedor
+  const [sellerDashboardOpen, setSellerDashboardOpen] = useState(false);
 
   // Toast / Mensajes de estado
   const [toastMessage, setToastMessage] = useState(null);
@@ -316,6 +320,7 @@ export default function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenQuestionnaire={() => setQuestionnaireOpen(true)}
         onOpenAuth={() => setAuthModalOpen(true)}
+        onOpenSellerDashboard={() => setSellerDashboardOpen(true)}
         user={user}
         onLogout={handleLogout}
         onSelectFranchiseFilter={(f) => {
@@ -420,6 +425,12 @@ export default function App() {
         onLogin={handleLogin}
         onRegister={handleRegister}
         loading={authLoading}
+      />
+
+      <SellerDashboard
+        isOpen={sellerDashboardOpen}
+        onClose={() => setSellerDashboardOpen(false)}
+        user={user}
       />
     </div>
   );

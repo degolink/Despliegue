@@ -106,3 +106,4 @@ Las respuestas del nuevo test mapean vectorialmente a las palabras clave, franqu
 
 **¿Son necesarias modificaciones en la base de datos SQL Server?**  
 **NO.** La estructura relacional existente (`dbo.PREFERENCIAS_USUARIO`, `dbo.PRODUCTOS`, `dbo.CONTEXTO_HISTORICO`) es perfectamente capaz de soportar la persistencia de las preferencias principales inferidas del test, mientras que el desglose multidimensional y el cálculo de afinidad se resuelven de forma limpia y eficiente en la capa de servicios de la aplicación. No se ejecutarán scripts destructivos ni migraciones DDL adicionales.
+
